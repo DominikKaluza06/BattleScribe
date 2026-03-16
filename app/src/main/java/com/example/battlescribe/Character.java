@@ -46,7 +46,6 @@ public class Character extends AppCompatActivity {
         incrementStat(R.id.STR, "str");
     }
 
-
     public void increaseDef(View view) {
         incrementStat(R.id.DEF, "def");
     }

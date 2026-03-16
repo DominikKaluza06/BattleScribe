@@ -4,5 +4,6 @@ public enum SlotType {
     WEAPON,
     HELMET,
     BOOTS,
+    RING,
     ARMOR
 }

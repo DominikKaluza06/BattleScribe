@@ -263,4 +263,134 @@
         app:layout_constraintStart_toEndOf="@+id/boots_slot"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <ImageView
+        android:id="@+id/inventory_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView7"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/inv_background"
+        tools:srcCompat="@drawable/inv_background" />
+
+    <ImageView
+        android:id="@+id/weapon_slot17"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot12"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot19"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot20"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot20"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot20"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot18"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot18"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot18"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot17"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot17"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot13"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot12"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot12"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot12"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="@+id/inventory_background"
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot2"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot15"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot14"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot14"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot14"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot13"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot13"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot2"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView7"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot3"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot9"
+        app:layout_constraintTop_toTopOf="@+id/inventory_background"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot9"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot10"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot10"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot10"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot2"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot2"
+        app:layout_constraintBottom_toBottomOf="@+id/weapon_slot2"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

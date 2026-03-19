@@ -23,6 +23,10 @@ public class ItemDB {
         addItem(new Item(102, "Steel Sword", steelSwordBitmap, SlotType.WEAPON, 10, 0, 0, 0));
     }
 
+    public static java.util.Collection<Item> getAllItems() {
+        return allItems.values();
+    }
+
     private static void addItem(Item item) {
         allItems.put(item.id, item);
     }

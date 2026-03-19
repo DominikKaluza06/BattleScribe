@@ -49,7 +49,7 @@
         android:layout_width="70dp"
         android:layout_height="27dp"
         android:layout_marginStart="12dp"
-        android:text="0"
+        android:text="10"
         android:textColor="#FBFAFA"
         android:textSize="20sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView"
@@ -59,7 +59,7 @@
         android:id="@+id/DEF"
         android:layout_width="70dp"
         android:layout_height="27dp"
-        android:text="0"
+        android:text="10"
         android:textColor="#FBFAFA"
         android:textSize="20sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView3"
@@ -70,7 +70,7 @@
         android:id="@+id/MGC"
         android:layout_width="70dp"
         android:layout_height="27dp"
-        android:text="0"
+        android:text="10"
         android:textColor="#FBFAFA"
         android:textSize="20sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/MGCtext"
@@ -81,7 +81,7 @@
         android:id="@+id/AGI"
         android:layout_width="70dp"
         android:layout_height="27dp"
-        android:text="0"
+        android:text="10"
         android:textColor="#FBFAFA"
         android:textSize="20sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/AGItext"
@@ -251,10 +251,10 @@
         tools:srcCompat="@tools:sample/avatars"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         app:layout_constraintStart_toEndOf="@+id/armor_slot"
-        app:layout_constraintEnd_toStartOf="@+id/imageView12" />
+        app:layout_constraintEnd_toStartOf="@+id/ring_slot" />
 
     <ImageView
-        android:id="@+id/imageView12"
+        android:id="@+id/ring_slot"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginTop="12dp"
@@ -278,44 +278,44 @@
         tools:srcCompat="@drawable/inv_background" />
 
     <ImageView
-        android:id="@+id/weapon_slot13"
+        android:id="@+id/weapon_slot6"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginStart="40dp"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot12"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot12"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot5"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot5"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/weapon_slot12"
+        android:id="@+id/weapon_slot5"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="40dp"
         app:layout_constraintStart_toStartOf="@+id/inventory_background"
-        app:layout_constraintTop_toBottomOf="@+id/weapon_slot2"
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot1"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/weapon_slot15"
+        android:id="@+id/weapon_slot8"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginStart="40dp"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot14"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot14"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot7"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot7"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/weapon_slot14"
+        android:id="@+id/weapon_slot7"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginStart="40dp"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot13"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot13"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot6"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot6"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/weapon_slot2"
+        android:id="@+id/weapon_slot1"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
@@ -325,31 +325,31 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
+        android:id="@+id/weapon_slot4"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot3"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot3"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
         android:id="@+id/weapon_slot3"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot9"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot9"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot9"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot10"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot10"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot10"
         android:layout_width="55dp"
         android:layout_height="56dp"
         android:layout_marginStart="40dp"
         app:layout_constraintStart_toEndOf="@+id/weapon_slot2"
         app:layout_constraintTop_toTopOf="@+id/weapon_slot2"
-        app:layout_constraintBottom_toBottomOf="@+id/weapon_slot2"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/weapon_slot2"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot1"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot1"
+        app:layout_constraintBottom_toBottomOf="@+id/weapon_slot1"
         tools:srcCompat="@tools:sample/avatars" />
 
     <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"
@@ -364,7 +364,7 @@
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/weapon_slot15"
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot8"
         app:srcCompat="@drawable/button_right" />
 
     <ImageButton
@@ -377,7 +377,7 @@
         android:rotationY="180"
         android:scaleType="centerInside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/weapon_slot12"
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot5"
         app:srcCompat="@drawable/button_right" />
 
     <TextView
@@ -393,6 +393,51 @@
         app:layout_constraintEnd_toStartOf="@+id/imageButton2"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toEndOf="@+id/imageButton3"
-        app:layout_constraintTop_toBottomOf="@+id/weapon_slot13" />
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot6" />
+
+    <LinearLayout
+        android:layout_width="410dp"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/inventory_background"
+        app:layout_constraintStart_toStartOf="@+id/inventory_background"
+        app:layout_constraintTop_toBottomOf="@+id/INVsitePage"
+        app:layout_constraintVertical_bias="1.0">
+
+
+        <ImageView
+            android:id="@+id/crafting"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/shop"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/map"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/character"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/skills"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

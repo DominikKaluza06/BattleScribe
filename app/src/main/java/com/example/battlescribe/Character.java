@@ -27,6 +27,14 @@ public class Character extends AppCompatActivity {
         ((TextView)findViewById(R.id.MGC)).setText(String.valueOf(prefs.getInt("mgc", 10)));
         ((TextView)findViewById(R.id.AGI)).setText(String.valueOf(prefs.getInt("agi", 10)));
 
+        SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+
+
+        SharedPreferences.Editor editor = itemPrefs.edit();
+        editor.putBoolean("owned_101", true); // Odklene Iron Sword
+        editor.putBoolean("owned_102", true); // Odklene Steel Sword
+        editor.apply();
+
         ItemDB.init(this); // Najprej pripravi slike
         loadInventory();   // Nato jih naloži v tabelo in prikaži
     }
@@ -60,12 +68,12 @@ public class Character extends AppCompatActivity {
     }
 
     public void increaseAgi(View view) {
-        incrementStat(R.id.AGI, "mgc");
+        incrementStat(R.id.AGI, "agi");
     }
 
     //Items
     private Item[] inventory = new Item[24];
-    private int currentPage = 1;
+    private int currentPage = 0;
 
     // A fixed array of your ImageView IDs from the XML
     private final int[] slotIds = {
@@ -98,14 +106,14 @@ public class Character extends AppCompatActivity {
         updateInventoryUI();
     }
 
-    public void nextPage(View view) {
+    public void INVnextPage(View view) {
         if (currentPage < 2) {
             currentPage++;
             updateInventoryUI();
         }
     }
 
-    public void prevPage(View view) {
+    public void INVprevPage(View view) {
         if (currentPage > 0) {
             currentPage--;
             updateInventoryUI();
@@ -115,10 +123,8 @@ public class Character extends AppCompatActivity {
         int startOffset = currentPage * 8; // Začne pri 0, 8 ali 16
 
         for (int i = 0; i < 8; i++) {
-            // Use the array to find the View instead of getIdentifier
             android.widget.ImageView slot = findViewById(slotIds[i]);
 
-            // Safety check to ensure we don't go out of bounds of the inventory array
             int inventoryIndex = startOffset + i;
             Item item;
             if (inventoryIndex < inventory.length) {

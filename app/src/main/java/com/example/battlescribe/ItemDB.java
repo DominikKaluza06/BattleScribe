@@ -13,13 +13,17 @@ public class ItemDB {
     public static void init(Context context) {
 
 
-        Bitmap swordSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.swords);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false; // <--- TA VRSTICA PREPREČI RAZTEGOVANJE
 
-        Bitmap ironSwordBitmap = Bitmap.createBitmap(swordSheet, 0, 0, 32, 32);
+        Bitmap swordSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.swords, options);
+
+        int swordSize=32;
+        Bitmap ironSwordBitmap = Bitmap.createBitmap(swordSheet, 0, 0, swordSize, swordSize);
         addItem(new Item(101, "Iron Sword", ironSwordBitmap, SlotType.WEAPON, 5, 0, 0, 0));
 
         // Če želiš naslednjo ikono desno od nje:
-        Bitmap steelSwordBitmap = Bitmap.createBitmap(swordSheet, 32, 0, 32, 32);
+        Bitmap steelSwordBitmap = Bitmap.createBitmap(swordSheet, 32, 0, swordSize, swordSize);
         addItem(new Item(102, "Steel Sword", steelSwordBitmap, SlotType.WEAPON, 10, 0, 0, 0));
     }
 

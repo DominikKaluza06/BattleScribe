@@ -464,6 +464,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="12dp"
+            android:background="#44FFFFFF"
             app:srcCompat="@android:drawable/ic_menu_myplaces"
             tools:srcCompat="@tools:sample/avatars" />
     </LinearLayout>

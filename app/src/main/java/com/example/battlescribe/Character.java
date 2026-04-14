@@ -16,8 +16,8 @@ import java.util.Map;
 
 public class Character extends AppCompatActivity {
 
-    private Map<SlotType, Item> equippedItems = new HashMap<>();
-    private Map<SlotType, Integer> slotViewIds = new HashMap<>();
+    private Map<SlotType, Item> equippedItems = new HashMap<SlotType, Item>();
+    private Map<SlotType, Integer> slotViewIds = new HashMap<SlotType, Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +28,14 @@ public class Character extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Character.this, ShopActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.skills).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), SkillsActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -57,7 +65,7 @@ public class Character extends AppCompatActivity {
                 Item item = ItemDB.getItem(itemId);
                 if (item != null) {
                     equippedItems.put(type, item);
-                    ImageView slotView = findViewById(slotViewIds.get(type));
+                    ImageView slotView = (ImageView) findViewById(slotViewIds.get(type));
                     if (slotView != null) {
                         slotView.setImageBitmap(item.iconBitmap);
                     }
@@ -87,15 +95,17 @@ public class Character extends AppCompatActivity {
 
                         SlotType targetSlot = null;
                         for (Map.Entry<SlotType, Integer> entry : slotViewIds.entrySet()) {
-                            if (entry.getValue() == v.getId()) {
+                            if (entry.getValue().equals(v.getId())) {
                                 targetSlot = entry.getKey();
                                 break;
                             }
                         }
 
-                        if (draggedItem != null && draggedItem.slot == targetSlot) {
-                            equipItem(draggedItem);
-                            return true;
+                        if (draggedItem != null) {
+                            if (draggedItem.slot == targetSlot) {
+                                equipItem(draggedItem);
+                                return true;
+                            }
                         }
                         return false;
                 }
@@ -103,7 +113,7 @@ public class Character extends AppCompatActivity {
             }
         };
 
-        for (int resId : slotViewIds.values()) {
+        for (Integer resId : slotViewIds.values()) {
             View view = findViewById(resId);
             if (view != null) {
                 view.setOnDragListener(dragListener);
@@ -119,7 +129,7 @@ public class Character extends AppCompatActivity {
         prefs.edit().putInt(item.slot.name(), item.id).apply();
 
         // Update UI
-        ImageView slotView = findViewById(slotViewIds.get(item.slot));
+        ImageView slotView = (ImageView) findViewById(slotViewIds.get(item.slot));
         if (slotView != null) {
             slotView.setImageBitmap(item.iconBitmap);
         }
@@ -163,12 +173,17 @@ public class Character extends AppCompatActivity {
     };
 
     private void loadInventory() {
-        for (int i = 0; i < 24; i++) inventory[i] = null;
+        for (int i = 0; i < 24; i++) {
+            inventory[i] = null;
+        }
         SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         int index = 0;
         for (Item item : ItemDB.getAllItems()) {
-            if (prefs.getBoolean("owned_" + item.id, false) && index < 24) {
-                inventory[index++] = item;
+            if (prefs.getBoolean("owned_" + item.id, false)) {
+                if (index < 24) {
+                    inventory[index] = item;
+                    index++;
+                }
             }
         }
         updateInventoryUI();
@@ -177,11 +192,18 @@ public class Character extends AppCompatActivity {
     private void updateInventoryUI() {
         int startOffset = currentPage * 8;
         for (int i = 0; i < 8; i++) {
-            ImageView slot = findViewById(slotIds[i]);
-            if (slot == null) continue;
+            ImageView slot = (ImageView) findViewById(slotIds[i]);
+            if (slot == null) {
+                continue;
+            }
             
             int inventoryIndex = startOffset + i;
-            final Item item = (inventoryIndex < inventory.length) ? inventory[inventoryIndex] : null;
+            final Item item;
+            if (inventoryIndex < inventory.length) {
+                item = inventory[inventoryIndex];
+            } else {
+                item = null;
+            }
 
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
@@ -200,12 +222,22 @@ public class Character extends AppCompatActivity {
                 slot.setOnLongClickListener(null);
             }
         }
-        TextView pageView = findViewById(R.id.INVsitePage);
+        TextView pageView = (TextView) findViewById(R.id.INVsitePage);
         if (pageView != null) {
             pageView.setText((currentPage + 1) + "/3");
         }
     }
 
-    public void INVnextPage(View view) { if (currentPage < 2) { currentPage++; updateInventoryUI(); } }
-    public void INVprevPage(View view) { if (currentPage > 0) { currentPage--; updateInventoryUI(); } }
+    public void INVnextPage(View view) {
+        if (currentPage < 2) {
+            currentPage++;
+            updateInventoryUI();
+        }
+    }
+    public void INVprevPage(View view) {
+        if (currentPage > 0) {
+            currentPage--;
+            updateInventoryUI();
+        }
+    }
 }

@@ -1,21 +1,58 @@
 package com.example.battlescribe;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Player extends Entity {
 
     private Map<SlotType, Item> equipment = new HashMap<>();
+    private List<Skill> equippedSkills = new ArrayList<>();
 
-    public Player(String name) {
-        // Name, HP, Str, Def, Mgc
-        // Let's give the player 20 Base Magic to start
+    public Player(String name, Context context) {
+        // Initializing with base 100 HP and base 10 stats
         super(name, 100, 10, 10, 10, 10);
+        loadStatsAndEquipment(context);
     }
 
-    public void equipItem(Item item) {
-        equipment.put(item.slot, item);
-        System.out.println("Equipped: " + item.name);
+    private void loadStatsAndEquipment(Context context) {
+        // 1. Load Base Stats from SharedPreferences
+        SharedPreferences statsPrefs = context.getSharedPreferences("CharacterStats", Context.MODE_PRIVATE);
+        this.baseStr = statsPrefs.getInt("str", 10);
+        this.baseDef = statsPrefs.getInt("def", 10);
+        this.baseMgc = statsPrefs.getInt("mgc", 10);
+        this.baseAgi = statsPrefs.getInt("agi", 10);
+
+        // 2. Load Equipped Items
+        SharedPreferences equipPrefs = context.getSharedPreferences("EquippedItems", Context.MODE_PRIVATE);
+        for (SlotType type : SlotType.values()) {
+            int itemId = equipPrefs.getInt(type.name(), -1);
+            if (itemId != -1) {
+                Item item = ItemDB.getItem(itemId);
+                if (item != null) {
+                    equipment.put(type, item);
+                }
+            }
+        }
+
+        // 3. Load Equipped Skills
+        SharedPreferences skillPrefs = context.getSharedPreferences("CharacterSkills", Context.MODE_PRIVATE);
+        equippedSkills.clear();
+        for (Skill skill : SkillDB.getAllSkills()) {
+            if (skillPrefs.getBoolean("equipped_" + skill.id, false)) {
+                equippedSkills.add(skill);
+            }
+        }
+        
+        // After loading stats and items, reset currentHp to the new MaxHp
+        this.currentHp = getMaxHp();
+    }
+
+    public List<Skill> getEquippedSkills() {
+        return equippedSkills;
     }
 
     @Override
@@ -36,7 +73,6 @@ public class Player extends Entity {
         return total;
     }
 
-    // <--- NEW MAGIC CALCULATION
     @Override
     public int getTotalMgc() {
         int total = baseMgc;
@@ -53,5 +89,11 @@ public class Player extends Entity {
             total += item.agiBonus;
         }
         return total;
+    }
+    
+    @Override
+    public int getMaxHp() {
+        // Base 100 HP + 2 HP for every point of total Defense
+        return maxHp + (getTotalDef() * 2);
     }
 }

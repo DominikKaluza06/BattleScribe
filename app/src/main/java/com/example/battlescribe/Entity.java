@@ -21,6 +21,7 @@ public abstract class Entity {
         this.baseAgi = baseAgi;
     }
 
+    public int getMaxHp() { return maxHp; }
     public int getTotalStr() { return baseStr; }
     public int getTotalDef() { return baseDef; }
     public int getTotalMgc() { return baseMgc; }
@@ -32,6 +33,14 @@ public abstract class Entity {
         int realDamage = Math.max(0, amount - getTotalDef());
         this.currentHp -= realDamage;
         if (this.currentHp < 0) this.currentHp = 0;
-        System.out.println(name + " took " + realDamage + " damage.");
+        System.out.println(name + " took " + realDamage + " damage. Current HP: " + currentHp + "/" + getMaxHp());
+    }
+
+    public void heal(int amount) {
+        this.currentHp += amount;
+        if (this.currentHp > getMaxHp()) {
+            this.currentHp = getMaxHp();
+        }
+        System.out.println(name + " healed for " + amount + ". Current HP: " + currentHp + "/" + getMaxHp());
     }
 }

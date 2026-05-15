@@ -1,42 +1,28 @@
 package com.example.battlescribe;
 
-import java.util.Random;
+import android.graphics.Bitmap;
 
 public class Monster extends Entity {
+    public int maxMana;
+    public int currentMana;
+    public int manaRegen;
+    public Bitmap icon;
     
-    private int experienceReward;
-    private Item dropItem;
-    private float dropChance; // 0.0 to 1.0 (e.g., 0.5 for 50%)
+    // Rewards
+    public int goldReward;
+    public int expReward;
 
-    public Monster(String name, int maxHp, int baseStr, int baseDef, int baseMgc, int baseAgi, int experienceReward, Item dropItem, float dropChance) {
-        super(name, maxHp, baseStr, baseDef, baseMgc, baseAgi);
-        this.experienceReward = experienceReward;
-        this.dropItem = dropItem;
-        this.dropChance = dropChance;
+    public Monster(String name, int hp, int mana, int manaRegen, int str, int def, int mgc, int agi, Bitmap icon, int gold, int exp) {
+        super(name, hp, str, def, mgc, agi);
+        this.maxMana = mana;
+        this.currentMana = mana;
+        this.manaRegen = manaRegen;
+        this.icon = icon;
+        this.goldReward = gold;
+        this.expReward = exp;
     }
 
-    public int getExperienceReward() {
-        return experienceReward;
-    }
-
-    public Item getDropItem() {
-        return dropItem;
-    }
-
-    public float getDropChance() {
-        return dropChance;
-    }
-
-    /**
-     * Rolls to see if the monster drops its item upon death.
-     * @return The Item dropped, or null if no drop occurred.
-     */
-    public Item rollDrop() {
-        if (dropItem == null) return null;
-        Random rand = new Random();
-        if (rand.nextFloat() <= dropChance) {
-            return dropItem;
-        }
-        return null;
+    public boolean isDead() {
+        return currentHp <= 0;
     }
 }

@@ -24,12 +24,51 @@
         android:layout_height="136dp"
         android:layout_marginStart="24dp"
         android:src="@mipmap/ic_launcher"
-
         android:contentDescription="Character Avatar"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.495" />
+
+    <!-- Reset Button -->
+    <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="RESET"
+        android:onClick="resetGame"
+        android:backgroundTint="#FF4444"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="Level: 1"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/tv_stat_points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:text="Stat Points: 0"
+        android:textColor="#FFD700"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_level"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_level" />
 
     <TextView
         android:id="@+id/textView"
@@ -209,8 +248,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
-
-    <!-- SLOTI ZA OPREMO - Zdaj so vsi v isti liniji in VIDNI -->
     <ImageView
         android:id="@+id/weapon_slot"
         android:layout_width="55dp"
@@ -266,6 +303,7 @@
         app:layout_constraintStart_toEndOf="@+id/boots_slot"
         app:layout_constraintTop_toTopOf="@+id/weapon_slot"
         app:srcCompat="@android:drawable/ic_menu_gallery" />
+
     <ImageView
         android:id="@+id/inventory_background"
         android:layout_width="0dp"
@@ -275,52 +313,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView7"
-        app:srcCompat="@drawable/inv_background"
-        tools:srcCompat="@drawable/inv_background" />
-    <ImageView
-        android:id="@+id/weapon_slot6"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot5"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot5"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot5"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="40dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:layout_constraintStart_toStartOf="@+id/inventory_background"
-        app:layout_constraintTop_toBottomOf="@+id/weapon_slot1"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot8"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot7"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot7"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot7"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot6"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot6"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:srcCompat="@drawable/inv_background" />
 
     <ImageView
         android:id="@+id/weapon_slot1"
@@ -329,32 +322,8 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="40dp"
         android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView7"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot4"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot3"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot3"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/weapon_slot3"
-        android:layout_width="55dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="40dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:layout_constraintStart_toEndOf="@+id/weapon_slot2"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot2"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView7" />
 
     <ImageView
         android:id="@+id/weapon_slot2"
@@ -362,14 +331,63 @@
         android:layout_height="56dp"
         android:layout_marginStart="40dp"
         android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
         app:layout_constraintStart_toEndOf="@+id/weapon_slot1"
-        app:layout_constraintTop_toTopOf="@+id/weapon_slot1"
-        app:layout_constraintBottom_toBottomOf="@+id/weapon_slot1"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot1" />
 
-    <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/weapon_slot3"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot2"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot2" />
+
+    <ImageView
+        android:id="@+id/weapon_slot4"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot3"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot3" />
+
+    <ImageView
+        android:id="@+id/weapon_slot5"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="@+id/inventory_background"
+        app:layout_constraintTop_toBottomOf="@+id/weapon_slot1" />
+
+    <ImageView
+        android:id="@+id/weapon_slot6"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot5"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot5" />
+
+    <ImageView
+        android:id="@+id/weapon_slot7"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot6"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot6" />
+
+    <ImageView
+        android:id="@+id/weapon_slot8"
+        android:layout_width="55dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toEndOf="@+id/weapon_slot7"
+        app:layout_constraintTop_toTopOf="@+id/weapon_slot7" />
 
     <ImageButton
         android:id="@+id/imageButton2"
@@ -410,7 +428,87 @@
         app:layout_constraintBottom_toBottomOf="@+id/inventory_background"
         app:layout_constraintEnd_toEndOf="@+id/inventory_background"
         app:layout_constraintStart_toStartOf="@+id/inventory_background" />
-    <!-- NAVIGACIJSKI MENI - Premaknjen na konec, da je nad vsemi sloji -->
+
+    <!-- Item Description Panel (Hidden by default, appears over inventory) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/char_item_info_panel"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="#EE000000"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:elevation="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/selected_char_item_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/selected_char_item_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:text="Item Name"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/char_item_action_button"
+            app:layout_constraintStart_toEndOf="@+id/selected_char_item_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/selected_char_item_desc"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/selected_char_item_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:text="Stats..."
+            android:textColor="#BBBBBB"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/char_item_action_button"
+            app:layout_constraintStart_toEndOf="@+id/selected_char_item_icon"
+            app:layout_constraintTop_toBottomOf="@+id/selected_char_item_name"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Buttons on the right side -->
+        <Button
+            android:id="@+id/char_item_action_button"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="EQUIP"
+            android:backgroundTint="#4CAF50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/char_item_close_button"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <Button
+            android:id="@+id/char_item_close_button"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="CLOSE"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/char_item_action_button"
+            app:layout_constraintBottom_toBottomOf="parent" />
+            
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
@@ -428,8 +526,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_compass"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:srcCompat="@android:drawable/ic_menu_compass" />
 
         <ImageView
             android:id="@+id/skills"
@@ -437,17 +534,15 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_manage"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:srcCompat="@android:drawable/ic_menu_manage" />
 
         <ImageView
-            android:id="@+id/map"
+            android:id="@+id/adventure"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_mapmode"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:srcCompat="@android:drawable/ic_menu_mapmode" />
 
         <ImageView
             android:id="@+id/crafting"
@@ -455,8 +550,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_edit"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <ImageView
             android:id="@+id/character"
@@ -465,8 +559,7 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:background="#44FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_myplaces"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:srcCompat="@android:drawable/ic_menu_myplaces" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

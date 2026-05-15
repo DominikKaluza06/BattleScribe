@@ -9,15 +9,17 @@ public class Skill {
     public Bitmap iconBitmap;
     public int baseValue;
     public int manaCost;
+    public int requiredLevel;
+    public int cooldown;
 
     // Scaling factors
     public float strScaling;
     public float defScaling;
     public float mgcScaling;
     public float agiScaling;
-    public float maxHpScaling; // NEW: Scaling based on % of Max HP
+    public float maxHpScaling; 
 
-    public Skill(int id, String name, String description, Bitmap iconBitmap, int baseValue, int manaCost,
+    public Skill(int id, String name, String description, Bitmap iconBitmap, int baseValue, int manaCost, int requiredLevel, int cooldown,
                  float strScaling, float defScaling, float mgcScaling, float agiScaling, float maxHpScaling) {
         this.id = id;
         this.name = name;
@@ -25,6 +27,8 @@ public class Skill {
         this.iconBitmap = iconBitmap;
         this.baseValue = baseValue;
         this.manaCost = manaCost;
+        this.requiredLevel = requiredLevel;
+        this.cooldown = cooldown;
         this.strScaling = strScaling;
         this.defScaling = defScaling;
         this.mgcScaling = mgcScaling;

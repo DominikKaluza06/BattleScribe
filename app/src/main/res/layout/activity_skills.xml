@@ -45,9 +45,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp">
-
-            <!-- Skills will be added here dynamically from SkillDB -->
-
         </LinearLayout>
     </ScrollView>
 
@@ -81,7 +78,7 @@
             app:srcCompat="@android:drawable/ic_menu_manage" />
 
         <ImageView
-            android:id="@+id/map"
+            android:id="@+id/adventure"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -104,5 +101,4 @@
             android:padding="12dp"
             app:srcCompat="@android:drawable/ic_menu_myplaces" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

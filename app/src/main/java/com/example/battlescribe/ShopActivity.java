@@ -17,7 +17,10 @@ public class ShopActivity extends AppCompatActivity {
     private int currentPage = 0;
     private Item selectedItem = null;
     private boolean isSelling = false;
+    private int playerGold = 0;
     
+    private TextView tvGold;
+
     private final int[] shopSlotIds = {
             R.id.shop_slot1, R.id.shop_slot2, R.id.shop_slot3, R.id.shop_slot4,
             R.id.shop_slot5, R.id.shop_slot6, R.id.shop_slot7, R.id.shop_slot8
@@ -39,6 +42,7 @@ public class ShopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
 
+        tvGold = findViewById(R.id.tv_gold);
         itemInfoPanel = findViewById(R.id.item_info_panel);
         selectedItemIcon = findViewById(R.id.selected_item_icon);
         selectedItemName = findViewById(R.id.selected_item_name);
@@ -60,6 +64,7 @@ public class ShopActivity extends AppCompatActivity {
 
         ItemDB.init(this);
         loadShopItems();
+        loadPlayerData();
         loadInventory();
     }
 
@@ -76,17 +81,35 @@ public class ShopActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Fixed: Use R.id.adventure instead of R.id.map to prevent crash
         findViewById(R.id.adventure).setOnClickListener(v -> {
             Intent intent = new Intent(ShopActivity.this, BattleChoiceActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
+
+        findViewById(R.id.crafting).setOnClickListener(v -> {
+            Intent intent = new Intent(ShopActivity.this, CraftingActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
+    }
+
+    private void loadPlayerData() {
+        SharedPreferences statsPrefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
+        playerGold = statsPrefs.getInt("gold", 0);
+        updateGoldUI();
+    }
+
+    private void updateGoldUI() {
+        if (tvGold != null) {
+            tvGold.setText("Gold: " + playerGold);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        loadPlayerData();
         loadInventory();
         itemInfoPanel.setVisibility(View.INVISIBLE);
         selectedItem = null;
@@ -170,7 +193,7 @@ public class ShopActivity extends AppCompatActivity {
         selectedItemIcon.setImageBitmap(item.iconBitmap);
         selectedItemName.setText(item.name);
         
-        String desc = "Slot: " + item.slot.name() + "\n" +
+        String desc = "Price: " + (isSellMode ? item.price / 2 : item.price) + " Gold\n" +
                      "STR: +" + item.strBonus + " | " + "DEF: +" + item.defBonus + "\n" +
                      "MGC: +" + item.mgcBonus + " | " + "AGI: +" + item.agiBonus;
         selectedItemDesc.setText(desc);
@@ -180,12 +203,12 @@ public class ShopActivity extends AppCompatActivity {
                 actionButton.setText("EQUIPPED");
                 actionButton.setEnabled(false);
             } else {
-                actionButton.setText("SELL");
+                actionButton.setText("SELL (" + (item.price / 2) + ")");
                 actionButton.setEnabled(true);
             }
         } else {
-            actionButton.setText("BUY");
-            actionButton.setEnabled(true);
+            actionButton.setText("BUY (" + item.price + ")");
+            actionButton.setEnabled(playerGold >= item.price);
         }
     }
 
@@ -196,13 +219,22 @@ public class ShopActivity extends AppCompatActivity {
 
     public void buyItem() {
         if (selectedItem == null) return;
-        SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
-        if (prefs.getBoolean("owned_" + selectedItem.id, false)) {
+        if (playerGold < selectedItem.price) {
+            Toast.makeText(this, "Not enough gold!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+        if (itemPrefs.getBoolean("owned_" + selectedItem.id, false)) {
             Toast.makeText(this, "You already own this!", Toast.LENGTH_SHORT).show();
             return;
         }
-        prefs.edit().putBoolean("owned_" + selectedItem.id, true).commit();
+        
+        playerGold -= selectedItem.price;
+        saveGold();
+        itemPrefs.edit().putBoolean("owned_" + selectedItem.id, true).commit();
+        
         Toast.makeText(this, "Bought " + selectedItem.name + "!", Toast.LENGTH_SHORT).show();
+        updateGoldUI();
         loadInventory();
         itemInfoPanel.setVisibility(View.INVISIBLE);
         selectedItem = null;
@@ -214,12 +246,22 @@ public class ShopActivity extends AppCompatActivity {
             Toast.makeText(this, "Cannot sell equipped item!", Toast.LENGTH_SHORT).show();
             return;
         }
+        
+        playerGold += selectedItem.price / 2;
+        saveGold();
+        
         SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         prefs.edit().remove("owned_" + selectedItem.id).commit();
+        
         Toast.makeText(this, "Sold " + selectedItem.name + "!", Toast.LENGTH_SHORT).show();
+        updateGoldUI();
         loadInventory();
         itemInfoPanel.setVisibility(View.INVISIBLE);
         selectedItem = null;
+    }
+
+    private void saveGold() {
+        getSharedPreferences("CharacterStats", MODE_PRIVATE).edit().putInt("gold", playerGold).apply();
     }
 
     public void SHOPnextPage(View view) {

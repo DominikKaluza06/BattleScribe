@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class BattleActivity extends AppCompatActivity {
 
@@ -55,6 +56,7 @@ public class BattleActivity extends AppCompatActivity {
         loadPlayerData();
         ItemDB.init(this);
         SkillDB.init(this);
+        MaterialDB.init(this);
         loadEquippedSkills();
         
         activeMonster = new Goblin(this, wave);
@@ -274,6 +276,22 @@ public class BattleActivity extends AppCompatActivity {
         playerExp += activeMonster.expReward;
         log("Gained " + activeMonster.goldReward + " Gold and " + activeMonster.expReward + " EXP!");
         
+        // Handle Material Drops
+        Random rnd = new Random();
+        SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
+        SharedPreferences.Editor matEditor = matPrefs.edit();
+        
+        for (Map.Entry<Integer, Double> drop : activeMonster.materialDrops.entrySet()) {
+            if (rnd.nextDouble() < drop.getValue()) {
+                int matId = drop.getKey();
+                Material mat = MaterialDB.getMaterial(matId);
+                int currentCount = matPrefs.getInt("mat_" + matId, 0);
+                matEditor.putInt("mat_" + matId, currentCount + 1);
+                log("Dropped: " + mat.name + "!");
+            }
+        }
+        matEditor.apply();
+
         int expToLevel = playerLevel * 100;
         while (playerExp >= expToLevel) {
             playerExp -= expToLevel;

@@ -27,8 +27,10 @@ public class Character extends AppCompatActivity {
 
     private int statPoints = 0;
     private int playerLevel = 1;
+    private int playerGold = 0;
     private TextView tvStatPoints;
     private TextView tvLevel;
+    private TextView tvGold;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class Character extends AppCompatActivity {
 
         tvStatPoints = findViewById(R.id.tv_stat_points);
         tvLevel = findViewById(R.id.tv_level);
+        tvGold = findViewById(R.id.tv_char_gold);
         itemInfoPanel = findViewById(R.id.char_item_info_panel);
         selectedItemIcon = findViewById(R.id.selected_char_item_icon);
         selectedItemName = findViewById(R.id.selected_char_item_name);
@@ -88,6 +91,12 @@ public class Character extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+
+        findViewById(R.id.crafting).setOnClickListener(v -> {
+            Intent intent = new Intent(Character.this, CraftingActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -105,6 +114,7 @@ public class Character extends AppCompatActivity {
         getSharedPreferences("EquippedItems", MODE_PRIVATE).edit().clear().commit();
         getSharedPreferences("CharacterSkills", MODE_PRIVATE).edit().clear().commit();
         getSharedPreferences("BattleProgress", MODE_PRIVATE).edit().clear().commit();
+        getSharedPreferences("MaterialInventory", MODE_PRIVATE).edit().clear().commit();
         
         Toast.makeText(this, "Save Deleted. Starting Fresh!", Toast.LENGTH_SHORT).show();
         
@@ -205,6 +215,7 @@ public class Character extends AppCompatActivity {
         int baseAgi = prefs.getInt("agi", 10);
         statPoints = prefs.getInt("statPoints", 0);
         playerLevel = prefs.getInt("level", 1);
+        playerGold = prefs.getInt("gold", 0);
 
         ((TextView) findViewById(R.id.tv_STR)).setText(String.valueOf(baseStr));
         ((TextView) findViewById(R.id.tv_DEF)).setText(String.valueOf(baseDef));
@@ -213,6 +224,7 @@ public class Character extends AppCompatActivity {
         
         if (tvStatPoints != null) tvStatPoints.setText("Stat Points: " + statPoints);
         if (tvLevel != null) tvLevel.setText("Level: " + playerLevel);
+        if (tvGold != null) tvGold.setText("Gold: " + playerGold);
     }
 
     private void spendStatPoint(String statKey) {

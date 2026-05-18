@@ -16,8 +16,10 @@ public class Item {
     public int strBonus, defBonus, mgcBonus, agiBonus;
 
     public Bitmap iconBitmap;
+    
+    public int price;
 
-    public Item(int id, String name, Bitmap icon, SlotType slot, int strBonus, int defBonus, int mgcBonus, int agiBonus) {
+    public Item(int id, String name, Bitmap icon, SlotType slot, int strBonus, int defBonus, int mgcBonus, int agiBonus, int price) {
         this.id = id;
         this.name = name;
         this.iconBitmap = icon;
@@ -26,5 +28,6 @@ public class Item {
         this.defBonus = defBonus;
         this.mgcBonus = mgcBonus;
         this.agiBonus = agiBonus;
+        this.price = price;
     }
 }

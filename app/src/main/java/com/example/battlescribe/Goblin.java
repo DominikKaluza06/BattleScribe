@@ -26,5 +26,12 @@ public class Goblin extends Monster {
             20 * level
         );
         this.currentMana = 0; // Start at 0 so it has to regen to use special
+        
+        // Material Drops
+        this.materialDrops.put(1, 0.4); // 40% chance for Iron Ore
+        this.materialDrops.put(4, 0.3); // 30% chance for Wood
+        if (level >= 5) {
+            this.materialDrops.put(2, 0.1); // 10% chance for Steel Bar
+        }
     }
 }

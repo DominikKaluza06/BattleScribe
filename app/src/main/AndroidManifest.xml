@@ -27,6 +27,9 @@
             android:name=".SkillsActivity"
             android:exported="false" />
         <activity
+            android:name=".CraftingActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

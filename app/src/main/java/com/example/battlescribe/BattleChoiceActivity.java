@@ -64,5 +64,10 @@ public class BattleChoiceActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
+        findViewById(R.id.crafting).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CraftingActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
     }
 }

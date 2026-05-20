@@ -2,10 +2,16 @@ package com.example.battlescribe;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +27,7 @@ public class CraftingActivity extends AppCompatActivity {
 
     private View craftingPanel;
     private TextView selectedRecipeName;
-    private TextView materialList;
+    private LinearLayout requirementsContainer;
     private Button btnCraft;
 
     private Recipe selectedRecipe;
@@ -30,10 +36,11 @@ public class CraftingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crafting);
+        hideSystemUI();
 
         craftingPanel = findViewById(R.id.crafting_panel);
         selectedRecipeName = findViewById(R.id.selected_recipe_name);
-        materialList = findViewById(R.id.material_list);
+        requirementsContainer = findViewById(R.id.requirements_container);
         btnCraft = findViewById(R.id.btn_craft);
 
         ItemDB.init(this);
@@ -43,6 +50,33 @@ public class CraftingActivity extends AppCompatActivity {
         setupNavigation();
 
         btnCraft.setOnClickListener(v -> craftItem());
+    }
+
+    private void hideSystemUI() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            final WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            // Older versions
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
     }
 
     private void setupRecipes() {
@@ -68,7 +102,7 @@ public class CraftingActivity extends AppCompatActivity {
         Item item = ItemDB.getItem(recipe.resultItemId);
         selectedRecipeName.setText(item.name);
         
-        StringBuilder sb = new StringBuilder();
+        requirementsContainer.removeAllViews();
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
         
         boolean canCraft = true;
@@ -77,11 +111,29 @@ public class CraftingActivity extends AppCompatActivity {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             int required = entry.getValue();
             
-            sb.append(mat.name).append(": ").append(owned).append("/").append(required).append("\n");
+            // Create a vertical layout for each material (Icon + Text)
+            LinearLayout matLayout = new LinearLayout(this);
+            matLayout.setOrientation(LinearLayout.VERTICAL);
+            matLayout.setGravity(Gravity.CENTER);
+            matLayout.setPadding(16, 0, 16, 0);
+
+            ImageView iv = new ImageView(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, 100);
+            iv.setLayoutParams(lp);
+            iv.setImageBitmap(mat.iconBitmap);
+            
+            TextView tv = new TextView(this);
+            tv.setText(owned + "/" + required);
+            tv.setTextColor(owned >= required ? Color.GREEN : Color.RED);
+            tv.setGravity(Gravity.CENTER);
+
+            matLayout.addView(iv);
+            matLayout.addView(tv);
+            requirementsContainer.addView(matLayout);
+
             if (owned < required) canCraft = false;
         }
         
-        materialList.setText(sb.toString());
         btnCraft.setEnabled(canCraft);
         craftingPanel.setVisibility(View.VISIBLE);
     }

@@ -91,23 +91,28 @@
             android:id="@+id/tv_requirements"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="Required Materials:"
             android:textColor="#BBBBBB"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/selected_recipe_name" />
 
-        <TextView
-            android:id="@+id/material_list"
+        <!-- New Scrollable container for materials -->
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="5x Iron Ore\n2x Wood"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_requirements" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_requirements">
+
+            <LinearLayout
+                android:id="@+id/requirements_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
 
         <Button
             android:id="@+id/btn_craft"

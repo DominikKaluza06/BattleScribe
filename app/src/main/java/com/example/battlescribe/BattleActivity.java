@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -48,6 +50,7 @@ public class BattleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
+        hideSystemUI();
 
         wave = getIntent().getIntExtra("WAVE", 1);
         isInfinite = getIntent().getBooleanExtra("IS_INFINITE", false);
@@ -64,6 +67,32 @@ public class BattleActivity extends AppCompatActivity {
         setupBattleUI();
         log((isInfinite ? "WAVE " + wave + ": " : "") + "A wild " + activeMonster.name + " appears!");
         log("It's your turn!");
+    }
+
+    private void hideSystemUI() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            final WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
     }
 
     private void initUI() {
@@ -83,7 +112,6 @@ public class BattleActivity extends AppCompatActivity {
         battleLog = findViewById(R.id.battle_log_text);
         btnBasicAttack = findViewById(R.id.btn_basic_attack);
 
-        // Skill Slots Initialization
         int[] slotIds = {R.id.skill_slot1, R.id.skill_slot2, R.id.skill_slot3, R.id.skill_slot4};
         int[] cdIds = {R.id.tv_skill_cd1, R.id.tv_skill_cd2, R.id.tv_skill_cd3, R.id.tv_skill_cd4};
 
@@ -221,14 +249,11 @@ public class BattleActivity extends AppCompatActivity {
         
         playerCurrentHp -= finalDamage;
         
-        // Player Mana Restoration
         int playerManaRegen = 2 + (playerMgc / 5);
         playerCurrentMana = Math.min(playerMaxMana, playerCurrentMana + playerManaRegen);
         
-        // Monster Mana Restoration
         activeMonster.currentMana = Math.min(activeMonster.maxMana, activeMonster.currentMana + activeMonster.manaRegen);
         
-        // Cooldown Tick
         for (Integer skillId : currentCooldowns.keySet()) {
             int cd = currentCooldowns.get(skillId);
             if (cd > 0) currentCooldowns.put(skillId, cd - 1);
@@ -276,7 +301,6 @@ public class BattleActivity extends AppCompatActivity {
         playerExp += activeMonster.expReward;
         log("Gained " + activeMonster.goldReward + " Gold and " + activeMonster.expReward + " EXP!");
         
-        // Handle Material Drops
         Random rnd = new Random();
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
         SharedPreferences.Editor matEditor = matPrefs.edit();

@@ -1,3 +1,54 @@
 <resources>
     <string name="app_name">BattleScribe</string>
+
+    <!-- General Navigation & Labels -->
+    <string name="title_character">CHARACTER</string>
+    <string name="title_shop">SHOP</string>
+    <string name="title_skills">SKILLS</string>
+    <string name="title_crafting">CRAFTING</string>
+    <string name="title_adventure">ADVENTURE</string>
+
+    <string name="label_gold">Gold: %1$s</string>
+    <string name="label_level">Level: %1$d</string>
+    <string name="label_stat_points">Stat Points: %1$d</string>
+    <string name="label_str">STR:</string>
+    <string name="label_def">DEF:</string>
+    <string name="label_mgc">MGC:</string>
+    <string name="label_agi">AGI:</string>
+    <string name="label_equipment">EQUIPMENT:</string>
+    <string name="label_items_for_sale">ITEMS FOR SALE:</string>
+    <string name="label_your_inventory">YOUR INVENTORY:</string>
+    <string name="label_recipes">RECIPES:</string>
+    <string name="label_required_materials">Required Materials:</string>
+
+    <!-- Buttons -->
+    <string name="btn_reset">RESET</string>
+    <string name="btn_buy">BUY</string>
+    <string name="btn_sell">SELL</string>
+    <string name="btn_equip">EQUIP</string>
+    <string name="btn_unequip">UNEQUIP</string>
+    <string name="btn_close">CLOSE</string>
+    <string name="btn_craft">CRAFT</string>
+    <string name="btn_continue_story">CONTINUE STORY</string>
+    <string name="btn_enter_combat">ENTER COMBAT</string>
+    <string name="btn_equipped">EQUIPPED</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_item_name">Item Name</string>
+    <string name="placeholder_skill_name">Skill Name</string>
+    <string name="placeholder_stats">Stats...</string>
+    <string name="placeholder_page">1/3</string>
+    <string name="placeholder_status_unequipped">UNEQUIPPED</string>
+    <string name="placeholder_desc">Description goes here...</string>
+    <string name="placeholder_hp">0/0</string>
+    <string name="placeholder_mana">0/0</string>
+
+    <!-- Adventure Screen -->
+    <string name="story_mode_title">STORY MODE</string>
+    <string name="story_mode_desc">Follow the main quest and uncover the secrets of the world. Progress through handcrafted levels.</string>
+    <string name="infinite_fight_title">INFINITE FIGHT</string>
+    <string name="infinite_fight_desc">Grind for gold and resources in endless combat. Enemies get stronger as you go!</string>
+
+    <!-- Battle Screen -->
+    <string name="battle_log_start">A wild %1$s appears!</string>
 </resources>

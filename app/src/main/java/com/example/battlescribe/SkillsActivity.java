@@ -40,7 +40,6 @@ public class SkillsActivity extends AppCompatActivity {
                 controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         } else {
-            // Za starejše verzije Androida
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -48,14 +47,6 @@ public class SkillsActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemUI();
         }
     }
 
@@ -81,38 +72,41 @@ public class SkillsActivity extends AppCompatActivity {
             ImageView icon = skillView.findViewById(R.id.skill_icon);
             TextView name = skillView.findViewById(R.id.skill_name);
             TextView desc = skillView.findViewById(R.id.skill_desc);
-            TextView statusText = skillView.findViewById(R.id.skill_status);
-            Button btnEquip = skillView.findViewById(R.id.btn_equip);
-            Button btnUnequip = skillView.findViewById(R.id.btn_unequip);
+            Button btnAction = skillView.findViewById(R.id.btn_skill_action);
+            TextView tvRequirement = skillView.findViewById(R.id.tv_skill_requirement);
 
             icon.setImageBitmap(skill.iconBitmap);
-            name.setText(skill.name + " (Lv " + skill.requiredLevel + ")");
+            name.setText(skill.name);
             desc.setText(skill.description);
 
             boolean isEquipped = skillPrefs.getBoolean("equipped_" + skill.id, false);
             boolean isLevelMet = playerLevel >= skill.requiredLevel;
 
             if (!isLevelMet) {
-                btnEquip.setEnabled(false);
-                btnUnequip.setEnabled(false);
-                statusText.setText("LOCKED (Requires Lv " + skill.requiredLevel + ")");
-                statusText.setTextColor(Color.RED);
+                btnAction.setVisibility(View.GONE);
+                tvRequirement.setVisibility(View.VISIBLE);
+                tvRequirement.setText(getString(R.string.skill_status_locked, skill.requiredLevel));
             } else {
-                updateUI(btnEquip, btnUnequip, statusText, isEquipped);
+                tvRequirement.setVisibility(View.GONE);
+                btnAction.setVisibility(View.VISIBLE);
+                updateButtonState(btnAction, isEquipped);
             }
 
-            btnEquip.setOnClickListener(v -> {
-                if (getEquippedCount(skillPrefs) < MAX_EQUIPPED_SKILLS) {
-                    skillPrefs.edit().putBoolean("equipped_" + skill.id, true).apply();
-                    updateUI(btnEquip, btnUnequip, statusText, true);
+            btnAction.setOnClickListener(v -> {
+                boolean currentlyEquipped = skillPrefs.getBoolean("equipped_" + skill.id, false);
+                if (currentlyEquipped) {
+                    // Unequip logic
+                    skillPrefs.edit().putBoolean("equipped_" + skill.id, false).apply();
+                    updateButtonState(btnAction, false);
                 } else {
-                    Toast.makeText(this, "Max 4 skills equipped!", Toast.LENGTH_SHORT).show();
+                    // Equip logic
+                    if (getEquippedCount(skillPrefs) < MAX_EQUIPPED_SKILLS) {
+                        skillPrefs.edit().putBoolean("equipped_" + skill.id, true).apply();
+                        updateButtonState(btnAction, true);
+                    } else {
+                        Toast.makeText(this, getString(R.string.toast_max_skills), Toast.LENGTH_SHORT).show();
+                    }
                 }
-            });
-
-            btnUnequip.setOnClickListener(v -> {
-                skillPrefs.edit().putBoolean("equipped_" + skill.id, false).apply();
-                updateUI(btnEquip, btnUnequip, statusText, false);
             });
 
             container.addView(skillView);
@@ -130,15 +124,13 @@ public class SkillsActivity extends AppCompatActivity {
         return count;
     }
 
-    private void updateUI(Button equip, Button unequip, TextView statusText, boolean isEquipped) {
-        equip.setEnabled(!isEquipped);
-        unequip.setEnabled(isEquipped);
+    private void updateButtonState(Button btn, boolean isEquipped) {
         if (isEquipped) {
-            statusText.setText("EQUIPPED");
-            statusText.setTextColor(Color.GREEN);
+            btn.setText(R.string.btn_unequip);
+            btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.RED));
         } else {
-            statusText.setText("READY");
-            statusText.setTextColor(Color.GRAY);
+            btn.setText(R.string.btn_equip);
+            btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50")));
         }
     }
 
@@ -155,11 +147,6 @@ public class SkillsActivity extends AppCompatActivity {
         });
         findViewById(R.id.adventure).setOnClickListener(v -> {
             Intent intent = new Intent(this, BattleChoiceActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-        });
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(this, CraftingActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });

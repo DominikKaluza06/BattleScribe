@@ -8,11 +8,11 @@
     <string name="title_crafting">CRAFTING</string>
     <string name="title_adventure">ADVENTURE</string>
 
-    <string name="label_gold">Gold: %1$s</string>
+    <string name="label_gold">Gold: %1$d</string>
     <string name="label_level">Level: %1$d</string>
     <string name="label_stat_points">Stat Points: %1$d</string>
     <string name="label_str">STR:</string>
-    <string name="label_def">DEF:</string>
+    <string name="label_vit">VIT:</string>
     <string name="label_mgc">MGC:</string>
     <string name="label_agi">AGI:</string>
     <string name="label_equipment">EQUIPMENT:</string>
@@ -20,6 +20,8 @@
     <string name="label_your_inventory">YOUR INVENTORY:</string>
     <string name="label_recipes">RECIPES:</string>
     <string name="label_required_materials">Required Materials:</string>
+    <string name="label_hp_format">%1$d/%2$d</string>
+    <string name="label_mana_format">%1$d/%2$d</string>
 
     <!-- Buttons -->
     <string name="btn_reset">RESET</string>
@@ -31,17 +33,23 @@
     <string name="btn_craft">CRAFT</string>
     <string name="btn_continue_story">CONTINUE STORY</string>
     <string name="btn_enter_combat">ENTER COMBAT</string>
+    <string name="btn_enter_combat_wave">ENTER COMBAT (WAVE %1$d)</string>
     <string name="btn_equipped">EQUIPPED</string>
+
+    <!-- Skill Status -->
+    <string name="skill_status_ready">READY</string>
+    <string name="skill_status_equipped">EQUIPPED</string>
+    <string name="skill_status_unequipped">UNEQUIPPED</string>
+    <string name="skill_status_locked">LOCKED (Requires Lv %1$d)</string>
 
     <!-- Placeholders -->
     <string name="placeholder_item_name">Item Name</string>
     <string name="placeholder_skill_name">Skill Name</string>
     <string name="placeholder_stats">Stats...</string>
     <string name="placeholder_page">1/3</string>
-    <string name="placeholder_status_unequipped">UNEQUIPPED</string>
     <string name="placeholder_desc">Description goes here...</string>
-    <string name="placeholder_hp">0/0</string>
-    <string name="placeholder_mana">0/0</string>
+    <string name="placeholder_hp">HP: 100/100</string>
+    <string name="placeholder_mana">Mana: 50/50</string>
 
     <!-- Adventure Screen -->
     <string name="story_mode_title">STORY MODE</string>
@@ -51,4 +59,33 @@
 
     <!-- Battle Screen -->
     <string name="battle_log_start">A wild %1$s appears!</string>
+    <string name="battle_log_start_wave">WAVE %1$d: A wild %2$s appears!</string>
+    <string name="battle_log_your_turn">It\'s your turn!</string>
+    <string name="battle_log_player_attack">You attack %1$s for %2$d damage!</string>
+    <string name="battle_log_monster_attack">%1$s attacks you for %2$d damage!</string>
+    <string name="battle_log_monster_special">%1$s uses %2$s for %3$d damage!</string>
+    <string name="battle_log_player_skill">You used %1$s for %2$d damage!</string>
+    <string name="battle_log_player_heal">You restored %1$d HP!</string>
+    <string name="battle_log_mana_regen">Restored %1$d mana.</string>
+    <string name="battle_log_victory">%1$s defeated!</string>
+    <string name="battle_log_rewards">Gained %1$d Gold and %2$d EXP!</string>
+    <string name="battle_log_level_up">LEVEL UP! Level %1$d (+5 Stat Points)</string>
+    <string name="battle_log_level_up_points">LEVEL UP! Level %1$d (+5 Stat Points)</string>
+    <string name="battle_log_defeat">You have been defeated...</string>
+    
+    <!-- Toasts -->
+    <string name="toast_bought">Bought %1$s!</string>
+    <string name="toast_sold">Sold %1$s!</string>
+    <string name="toast_already_owned">You already own this!</string>
+    <string name="toast_cannot_sell_equipped">Cannot sell equipped item!</string>
+    <string name="toast_not_enough_mana">Not enough mana!</string>
+    <string name="toast_skill_on_cooldown">Skill on cooldown!</string>
+    <string name="toast_no_stat_points">No stat points available!</string>
+    <string name="toast_max_skills">Max 4 skills equipped!</string>
+    <string name="toast_reset_fresh">Save Deleted. Starting Fresh!</string>
+    <string name="toast_coming_soon">Coming soon!</string>
+
+    <!-- Misc -->
+    <string name="hero_name">Hero</string>
+    <string name="hero_lv_format">Hero (Lv %1$d)</string>
 </resources>

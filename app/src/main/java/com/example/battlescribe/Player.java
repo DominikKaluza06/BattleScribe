@@ -22,7 +22,7 @@ public class Player extends Entity {
         // 1. Load Base Stats from SharedPreferences
         SharedPreferences statsPrefs = context.getSharedPreferences("CharacterStats", Context.MODE_PRIVATE);
         this.baseStr = statsPrefs.getInt("str", 10);
-        this.baseDef = statsPrefs.getInt("def", 10);
+        this.baseVit = statsPrefs.getInt("vit", 10); // Renamed from def
         this.baseMgc = statsPrefs.getInt("mgc", 10);
         this.baseAgi = statsPrefs.getInt("agi", 10);
 
@@ -64,11 +64,10 @@ public class Player extends Entity {
         return total;
     }
 
-    @Override
-    public int getTotalDef() {
-        int total = baseDef;
+    public int getTotalVit() {
+        int total = baseVit;
         for (Item item : equipment.values()) {
-            total += item.defBonus;
+            total += item.vitBonus;
         }
         return total;
     }
@@ -93,7 +92,7 @@ public class Player extends Entity {
     
     @Override
     public int getMaxHp() {
-        // Base 100 HP + 2 HP for every point of total Defense
-        return maxHp + (getTotalDef() * 2);
+        // Vitality increases max HP: Base 100 + 10 per total Vitality
+        return 100 + (getTotalVit() * 10);
     }
 }

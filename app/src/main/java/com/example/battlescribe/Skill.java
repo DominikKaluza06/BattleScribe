@@ -14,13 +14,13 @@ public class Skill {
 
     // Scaling factors
     public float strScaling;
-    public float defScaling;
+    public float vitScaling;
     public float mgcScaling;
     public float agiScaling;
     public float maxHpScaling; 
 
     public Skill(int id, String name, String description, Bitmap iconBitmap, int baseValue, int manaCost, int requiredLevel, int cooldown,
-                 float strScaling, float defScaling, float mgcScaling, float agiScaling, float maxHpScaling) {
+                 float strScaling, float vitScaling, float mgcScaling, float agiScaling, float maxHpScaling) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -30,7 +30,7 @@ public class Skill {
         this.requiredLevel = requiredLevel;
         this.cooldown = cooldown;
         this.strScaling = strScaling;
-        this.defScaling = defScaling;
+        this.vitScaling = vitScaling;
         this.mgcScaling = mgcScaling;
         this.agiScaling = agiScaling;
         this.maxHpScaling = maxHpScaling;
@@ -39,7 +39,7 @@ public class Skill {
     /**
      * Calculates total value (damage or healing) based on base value and character stats.
      */
-    public int calculateValue(int str, int def, int mgc, int agi, int maxHp) {
-        return baseValue + (int)(str * strScaling + def * defScaling + mgc * mgcScaling + agi * agiScaling + maxHp * maxHpScaling);
+    public int calculateValue(int str, int vit, int mgc, int agi, int maxHp) {
+        return baseValue + (int)(str * strScaling + vit * vitScaling + mgc * mgcScaling + agi * agiScaling + maxHp * maxHpScaling);
     }
 }

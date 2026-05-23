@@ -115,12 +115,6 @@ public class ShopActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
-
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-        });
     }
 
     private void loadPlayerData() {
@@ -223,7 +217,7 @@ public class ShopActivity extends AppCompatActivity {
         selectedItemName.setText(item.name);
         
         String desc = "Price: " + (isSellMode ? item.price / 2 : item.price) + " Gold\n" +
-                     "STR: +" + item.strBonus + " | " + "DEF: +" + item.defBonus + "\n" +
+                     "STR: +" + item.strBonus + " | " + "VIT: +" + item.vitBonus + "\n" +
                      "MGC: +" + item.mgcBonus + " | " + "AGI: +" + item.agiBonus;
         selectedItemDesc.setText(desc);
         

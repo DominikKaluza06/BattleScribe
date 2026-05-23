@@ -13,19 +13,19 @@ public class Item {
     public SlotType slot;
 
     // Stats
-    public int strBonus, defBonus, mgcBonus, agiBonus;
+    public int strBonus, vitBonus, mgcBonus, agiBonus;
 
     public Bitmap iconBitmap;
     
     public int price;
 
-    public Item(int id, String name, Bitmap icon, SlotType slot, int strBonus, int defBonus, int mgcBonus, int agiBonus, int price) {
+    public Item(int id, String name, Bitmap icon, SlotType slot, int strBonus, int vitBonus, int mgcBonus, int agiBonus, int price) {
         this.id = id;
         this.name = name;
         this.iconBitmap = icon;
         this.slot = slot;
         this.strBonus = strBonus;
-        this.defBonus = defBonus;
+        this.vitBonus = vitBonus;
         this.mgcBonus = mgcBonus;
         this.agiBonus = agiBonus;
         this.price = price;

@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
+    android:layout_height="160dp"
     android:layout_marginBottom="8dp"
     android:background="#2A2A2A"
     android:padding="12dp">
@@ -22,10 +22,22 @@
         android:layout_marginStart="16dp"
         android:text="Skill Name"
         android:textColor="#FFFFFF"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_skill_requirement"
         app:layout_constraintStart_toEndOf="@+id/skill_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_skill_requirement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Requires Lv 3"
+        android:textColor="#FF4444"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -37,39 +49,17 @@
         android:text="Skill Description goes here..."
         android:textColor="#CCCCCC"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_equip"
+        app:layout_constraintBottom_toTopOf="@+id/btn_skill_action"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/skill_name"
         app:layout_constraintTop_toBottomOf="@+id/skill_name" />
 
     <Button
-        android:id="@+id/btn_equip"
-        android:layout_width="wrap_content"
+        android:id="@+id/btn_skill_action"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="EQUIP"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn_unequip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="UNEQUIP"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_equip" />
-
-    <TextView
-        android:id="@+id/skill_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="UNEQUIPPED"
-        android:textColor="#FF9800"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_unequip"
-        app:layout_constraintStart_toEndOf="@+id/btn_unequip"
-        app:layout_constraintTop_toTopOf="@+id/btn_unequip" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

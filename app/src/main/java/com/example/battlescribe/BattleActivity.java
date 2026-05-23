@@ -4,8 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -15,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class BattleActivity extends AppCompatActivity {
 
@@ -26,7 +23,7 @@ public class BattleActivity extends AppCompatActivity {
     private TextView tvMonsterHp, tvMonsterMana;
 
     private int playerMaxHp, playerCurrentHp, playerMaxMana, playerCurrentMana;
-    private int playerStr, playerDef, playerMgc, playerAgi;
+    private int playerStr, playerVit, playerMgc, playerAgi;
     private int playerGold, playerExp, playerLevel, playerStatPoints;
     private Item equippedWeapon;
     private List<Skill> equippedSkills = new ArrayList<>();
@@ -50,7 +47,6 @@ public class BattleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
-        hideSystemUI();
 
         wave = getIntent().getIntExtra("WAVE", 1);
         isInfinite = getIntent().getBooleanExtra("IS_INFINITE", false);
@@ -59,40 +55,13 @@ public class BattleActivity extends AppCompatActivity {
         loadPlayerData();
         ItemDB.init(this);
         SkillDB.init(this);
-        MaterialDB.init(this);
         loadEquippedSkills();
         
         activeMonster = new Goblin(this, wave);
         
         setupBattleUI();
-        log((isInfinite ? "WAVE " + wave + ": " : "") + "A wild " + activeMonster.name + " appears!");
-        log("It's your turn!");
-    }
-
-    private void hideSystemUI() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            final WindowInsetsController controller = getWindow().getInsetsController();
-            if (controller != null) {
-                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemUI();
-        }
+        log(getString(R.string.battle_log_start_wave, wave, activeMonster.name));
+        log(getString(R.string.battle_log_your_turn));
     }
 
     private void initUI() {
@@ -129,7 +98,7 @@ public class BattleActivity extends AppCompatActivity {
     private void loadPlayerData() {
         SharedPreferences statsPrefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
         playerStr = statsPrefs.getInt("str", 10);
-        playerDef = statsPrefs.getInt("def", 10);
+        playerVit = statsPrefs.getInt("vit", 10);
         playerMgc = statsPrefs.getInt("mgc", 10);
         playerAgi = statsPrefs.getInt("agi", 10);
         playerGold = statsPrefs.getInt("gold", 0);
@@ -146,7 +115,7 @@ public class BattleActivity extends AppCompatActivity {
             btnBasicAttack.setImageResource(android.R.drawable.ic_menu_send);
         }
         
-        playerMaxHp = 50 + (playerDef * 5);
+        playerMaxHp = 100 + (playerVit * 10);
         playerCurrentHp = playerMaxHp;
         playerMaxMana = 20 + (playerMgc * 3);
         playerCurrentMana = playerMaxMana;
@@ -178,7 +147,7 @@ public class BattleActivity extends AppCompatActivity {
         monsterHpBar.setMax(activeMonster.getMaxHp());
         monsterManaBar.setMax(activeMonster.maxMana > 0 ? activeMonster.maxMana : 100);
 
-        playerName.setText("Hero (Lv " + playerLevel + ")");
+        playerName.setText(getString(R.string.hero_lv_format, playerLevel));
         playerHpBar.setMax(playerMaxHp);
         playerManaBar.setMax(playerMaxMana);
         
@@ -193,35 +162,34 @@ public class BattleActivity extends AppCompatActivity {
         if (!isPlayerTurn || activeMonster.isDead() || playerCurrentHp <= 0) return;
 
         int totalStr = playerStr + (equippedWeapon != null ? equippedWeapon.strBonus : 0);
-        int totalDef = playerDef + (equippedWeapon != null ? equippedWeapon.defBonus : 0);
+        int totalVit = playerVit + (equippedWeapon != null ? equippedWeapon.vitBonus : 0);
         int totalMgc = playerMgc + (equippedWeapon != null ? equippedWeapon.mgcBonus : 0);
         int totalAgi = playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0);
 
         if (skill == null) {
-            int damageValue = totalStr;
-            int actualDamage = Math.max(1, damageValue - activeMonster.getTotalDef());
-            activeMonster.takeDamage(damageValue);
-            log("You attack " + activeMonster.name + " for " + actualDamage + " damage!");
+            int actualDamage = totalStr; // No defense reduction for monsters now as requested
+            activeMonster.takeDamage(totalStr);
+            log(getString(R.string.battle_log_player_attack, activeMonster.name, actualDamage));
         } else {
             if (currentCooldowns.get(skill.id) > 0) {
-                Toast.makeText(this, "Skill on cooldown!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_skill_on_cooldown), Toast.LENGTH_SHORT).show();
                 return;
             }
             if (playerCurrentMana < skill.manaCost) {
-                Toast.makeText(this, "Not enough mana!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_not_enough_mana), Toast.LENGTH_SHORT).show();
                 return;
             }
             playerCurrentMana -= skill.manaCost;
             currentCooldowns.put(skill.id, skill.cooldown);
             
-            int skillValue = skill.calculateValue(totalStr, totalDef, totalMgc, totalAgi, playerMaxHp);
+            int skillValue = skill.calculateValue(totalStr, totalVit, totalMgc, totalAgi, playerMaxHp);
             if (skill.name.toLowerCase().contains("heal")) {
                 playerCurrentHp = Math.min(playerMaxHp, playerCurrentHp + skillValue);
-                log("You used " + skill.name + " and restored " + skillValue + " HP!");
+                log(getString(R.string.battle_log_player_heal, skillValue));
             } else {
-                int actualDamage = Math.max(1, skillValue - activeMonster.getTotalDef());
+                int actualDamage = skillValue;
                 activeMonster.takeDamage(skillValue);
-                log("You used " + skill.name + " for " + actualDamage + " damage!");
+                log(getString(R.string.battle_log_player_skill, skill.name, actualDamage));
             }
         }
 
@@ -240,11 +208,11 @@ public class BattleActivity extends AppCompatActivity {
         int finalDamage;
         if (activeMonster.currentMana >= activeMonster.maxMana && activeMonster.maxMana > 0) {
             activeMonster.currentMana -= activeMonster.maxMana;
-            finalDamage = Math.max(1, 15 + (activeMonster.getTotalStr() / 2) - (playerDef / 2));
-            log(activeMonster.name + " uses GOBLIN SPECIAL for " + finalDamage + " damage!");
+            finalDamage = Math.max(1, 15 + (activeMonster.getTotalStr() / 2)); 
+            log(getString(R.string.battle_log_monster_special, activeMonster.name, "SPECIAL", finalDamage));
         } else {
-            finalDamage = Math.max(1, activeMonster.getTotalStr() - (playerDef / 2));
-            log(activeMonster.name + " attacks you for " + finalDamage + " damage!");
+            finalDamage = Math.max(1, activeMonster.getTotalStr());
+            log(getString(R.string.battle_log_monster_attack, activeMonster.name, finalDamage));
         }
         
         playerCurrentHp -= finalDamage;
@@ -264,7 +232,7 @@ public class BattleActivity extends AppCompatActivity {
         if (playerCurrentHp <= 0) checkDefeat();
         else {
             isPlayerTurn = true;
-            log("Your turn!");
+            log(getString(R.string.battle_log_your_turn));
         }
     }
 
@@ -274,10 +242,10 @@ public class BattleActivity extends AppCompatActivity {
         playerHpBar.setProgress(playerCurrentHp);
         playerManaBar.setProgress(playerCurrentMana);
 
-        tvMonsterHp.setText(activeMonster.currentHp + "/" + activeMonster.getMaxHp());
-        tvMonsterMana.setText(activeMonster.currentMana + "/" + activeMonster.maxMana);
-        tvPlayerHp.setText(playerCurrentHp + "/" + playerMaxHp);
-        tvPlayerMana.setText(playerCurrentMana + "/" + playerMaxMana);
+        tvMonsterHp.setText(getString(R.string.label_hp_format, activeMonster.currentHp, activeMonster.getMaxHp()));
+        tvMonsterMana.setText(getString(R.string.label_mana_format, activeMonster.currentMana, activeMonster.maxMana));
+        tvPlayerHp.setText(getString(R.string.label_hp_format, playerCurrentHp, playerMaxHp));
+        tvPlayerMana.setText(getString(R.string.label_mana_format, playerCurrentMana, playerMaxMana));
     }
 
     private void updateSkillIcons() {
@@ -296,32 +264,17 @@ public class BattleActivity extends AppCompatActivity {
     }
 
     private void checkVictory() {
-        log(activeMonster.name + " defeated!");
+        log(getString(R.string.battle_log_victory, activeMonster.name));
         playerGold += activeMonster.goldReward;
         playerExp += activeMonster.expReward;
-        log("Gained " + activeMonster.goldReward + " Gold and " + activeMonster.expReward + " EXP!");
+        log(getString(R.string.battle_log_rewards, activeMonster.goldReward, activeMonster.expReward));
         
-        Random rnd = new Random();
-        SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
-        SharedPreferences.Editor matEditor = matPrefs.edit();
-        
-        for (Map.Entry<Integer, Double> drop : activeMonster.materialDrops.entrySet()) {
-            if (rnd.nextDouble() < drop.getValue()) {
-                int matId = drop.getKey();
-                Material mat = MaterialDB.getMaterial(matId);
-                int currentCount = matPrefs.getInt("mat_" + matId, 0);
-                matEditor.putInt("mat_" + matId, currentCount + 1);
-                log("Dropped: " + mat.name + "!");
-            }
-        }
-        matEditor.apply();
-
         int expToLevel = playerLevel * 100;
         while (playerExp >= expToLevel) {
             playerExp -= expToLevel;
             playerLevel++;
             playerStatPoints += 5;
-            log("LEVEL UP! Level " + playerLevel + " (+5 Stat Points)");
+            log(getString(R.string.battle_log_level_up, playerLevel));
             expToLevel = playerLevel * 100;
         }
 
@@ -330,7 +283,7 @@ public class BattleActivity extends AppCompatActivity {
             SharedPreferences p = getSharedPreferences("BattleProgress", MODE_PRIVATE);
             if (wave == p.getInt("infinite_wave", 1)) p.edit().putInt("infinite_wave", wave + 1).apply();
         }
-        Toast.makeText(this, "Victory!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.skill_status_ready, Toast.LENGTH_SHORT).show();
         battleHandler.postDelayed(this::finish, 2000);
     }
 
@@ -341,8 +294,8 @@ public class BattleActivity extends AppCompatActivity {
 
     private void checkDefeat() {
         playerCurrentHp = 0;
-        log("Defeated...");
-        Toast.makeText(this, "Defeat!", Toast.LENGTH_LONG).show();
+        log(getString(R.string.battle_log_defeat));
+        Toast.makeText(this, R.string.battle_log_defeat, Toast.LENGTH_LONG).show();
         battleHandler.postDelayed(this::finish, 2000);
     }
 }

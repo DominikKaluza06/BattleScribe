@@ -4,10 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,20 +27,18 @@ public class Character extends AppCompatActivity {
 
     private int statPoints = 0;
     private int playerLevel = 1;
-    private int playerGold = 0;
     private TextView tvStatPoints;
     private TextView tvLevel;
-    private TextView tvGold;
+    private TextView tvCharGold;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_character);
-        hideSystemUI();
 
         tvStatPoints = findViewById(R.id.tv_stat_points);
         tvLevel = findViewById(R.id.tv_level);
-        tvGold = findViewById(R.id.tv_char_gold);
+        tvCharGold = findViewById(R.id.tv_char_gold);
         itemInfoPanel = findViewById(R.id.char_item_info_panel);
         selectedItemIcon = findViewById(R.id.selected_char_item_icon);
         selectedItemName = findViewById(R.id.selected_char_item_name);
@@ -74,32 +69,6 @@ public class Character extends AppCompatActivity {
         ItemDB.init(this);
     }
 
-    private void hideSystemUI() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            final WindowInsetsController controller = getWindow().getInsetsController();
-            if (controller != null) {
-                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemUI();
-        }
-    }
-
     private void setupNavigation() {
         findViewById(R.id.shop).setOnClickListener(v -> {
             Intent intent = new Intent(Character.this, ShopActivity.class);
@@ -121,12 +90,6 @@ public class Character extends AppCompatActivity {
                 startActivity(intent);
             });
         }
-
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(Character.this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-        });
     }
 
     @Override
@@ -146,7 +109,7 @@ public class Character extends AppCompatActivity {
         getSharedPreferences("BattleProgress", MODE_PRIVATE).edit().clear().commit();
         getSharedPreferences("MaterialInventory", MODE_PRIVATE).edit().clear().commit();
         
-        Toast.makeText(this, "Save Deleted. Starting Fresh!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.toast_reset_fresh), Toast.LENGTH_SHORT).show();
         
         loadEquippedItems();
         loadInventory();
@@ -162,12 +125,12 @@ public class Character extends AppCompatActivity {
         selectedItemName.setText(item.name);
         
         String desc = "Slot: " + item.slot.name() + "\n" +
-                     "STR: +" + item.strBonus + " | " + "DEF: +" + item.defBonus + "\n" +
+                     "STR: +" + item.strBonus + " | " + "VIT: +" + item.vitBonus + "\n" +
                      "MGC: +" + item.mgcBonus + " | " + "AGI: +" + item.agiBonus;
         selectedItemDesc.setText(desc);
 
         if (fromEquipSlot) {
-            actionButton.setText("UNEQUIP");
+            actionButton.setText(R.string.btn_unequip);
             actionButton.setEnabled(true);
             actionButton.setAlpha(1.0f);
             actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFFF4444)); 
@@ -175,11 +138,11 @@ public class Character extends AppCompatActivity {
             actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50)); 
             SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
             if (prefs.getInt(item.slot.name(), -1) == item.id) {
-                actionButton.setText("EQUIPPED");
+                actionButton.setText(R.string.btn_equipped);
                 actionButton.setEnabled(false);
                 actionButton.setAlpha(0.5f);
             } else {
-                actionButton.setText("EQUIP");
+                actionButton.setText(R.string.btn_equip);
                 actionButton.setEnabled(true);
                 actionButton.setAlpha(1.0f);
             }
@@ -239,21 +202,21 @@ public class Character extends AppCompatActivity {
     private void refreshStatsUI() {
         SharedPreferences prefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
         int baseStr = prefs.getInt("str", 10);
-        int baseDef = prefs.getInt("def", 10);
+        int baseVit = prefs.getInt("vit", 10);
         int baseMgc = prefs.getInt("mgc", 10);
         int baseAgi = prefs.getInt("agi", 10);
         statPoints = prefs.getInt("statPoints", 0);
         playerLevel = prefs.getInt("level", 1);
-        playerGold = prefs.getInt("gold", 0);
+        int gold = prefs.getInt("gold", 0);
 
         ((TextView) findViewById(R.id.tv_STR)).setText(String.valueOf(baseStr));
-        ((TextView) findViewById(R.id.tv_DEF)).setText(String.valueOf(baseDef));
+        ((TextView) findViewById(R.id.tv_VIT)).setText(String.valueOf(baseVit));
         ((TextView) findViewById(R.id.tv_MGC)).setText(String.valueOf(baseMgc));
         ((TextView) findViewById(R.id.tv_AGI)).setText(String.valueOf(baseAgi));
         
-        if (tvStatPoints != null) tvStatPoints.setText("Stat Points: " + statPoints);
-        if (tvLevel != null) tvLevel.setText("Level: " + playerLevel);
-        if (tvGold != null) tvGold.setText("Gold: " + playerGold);
+        if (tvStatPoints != null) tvStatPoints.setText(getString(R.string.label_stat_points, statPoints));
+        if (tvLevel != null) tvLevel.setText(getString(R.string.label_level, playerLevel));
+        if (tvCharGold != null) tvCharGold.setText(getString(R.string.label_gold, gold));
     }
 
     private void spendStatPoint(String statKey) {
@@ -268,12 +231,12 @@ public class Character extends AppCompatActivity {
                 .apply();
             refreshStatsUI();
         } else {
-            Toast.makeText(this, "No stat points available!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_no_stat_points), Toast.LENGTH_SHORT).show();
         }
     }
 
     public void increaseStr(View view) { spendStatPoint("str"); }
-    public void increaseDef(View view) { spendStatPoint("def"); }
+    public void increaseVit(View view) { spendStatPoint("vit"); }
     public void increaseMgc(View view) { spendStatPoint("mgc"); }
     public void increaseAgi(View view) { spendStatPoint("agi"); }
 

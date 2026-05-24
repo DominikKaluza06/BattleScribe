@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ShopActivity extends AppCompatActivity {
 
@@ -66,8 +68,8 @@ public class ShopActivity extends AppCompatActivity {
         setupNavigation();
 
         ItemDB.init(this);
-        loadShopItems();
         loadPlayerData();
+        loadShopItems();
         loadInventory();
     }
 
@@ -125,7 +127,7 @@ public class ShopActivity extends AppCompatActivity {
 
     private void updateGoldUI() {
         if (tvGold != null) {
-            tvGold.setText("Gold: " + playerGold);
+            tvGold.setText(getString(R.string.label_gold, playerGold));
         }
     }
 
@@ -133,6 +135,7 @@ public class ShopActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadPlayerData();
+        loadShopItems();
         loadInventory();
         itemInfoPanel.setVisibility(View.INVISIBLE);
         selectedItem = null;
@@ -140,21 +143,41 @@ public class ShopActivity extends AppCompatActivity {
 
     private void loadShopItems() {
         for (int i = 0; i < 24; i++) shopItems[i] = null;
-        shopItems[0] = ItemDB.getItem(101);
-        shopItems[1] = ItemDB.getItem(102);
-        shopItems[2] = ItemDB.getItem(103);
+        
+        SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
+        int currentChapter = storyPrefs.getInt("chapter", 1);
+        
+        int index = 0;
+        for (Item item : ItemDB.getAllItems()) {
+            if (item.requiredChapter <= currentChapter) {
+                if (index < 24) {
+                    shopItems[index] = item;
+                    index++;
+                }
+            }
+        }
         updateShopUI();
     }
 
     private void loadInventory() {
         for (int i = 0; i < 24; i++) inventoryItems[i] = null;
-        SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+        SharedPreferences itemsPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+        SharedPreferences equipPrefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
+        
+        Set<Integer> equippedIds = new HashSet<>();
+        for (SlotType type : SlotType.values()) {
+            int id = equipPrefs.getInt(type.name(), -1);
+            if (id != -1) equippedIds.add(id);
+        }
+
         int index = 0;
         for (Item item : ItemDB.getAllItems()) {
-            if (prefs.getBoolean("owned_" + item.id, false)) {
-                if (index < 24) {
-                    inventoryItems[index] = item;
-                    index++;
+            if (itemsPrefs.getBoolean("owned_" + item.id, false)) {
+                if (!equippedIds.contains(item.id)) {
+                    if (index < 24) {
+                        inventoryItems[index] = item;
+                        index++;
+                    }
                 }
             }
         }
@@ -194,7 +217,7 @@ public class ShopActivity extends AppCompatActivity {
 
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
-                slot.setAlpha(isEquipped(item) ? 0.5f : 1.0f);
+                slot.setAlpha(1.0f);
                 slot.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -222,22 +245,12 @@ public class ShopActivity extends AppCompatActivity {
         selectedItemDesc.setText(desc);
         
         if (isSellMode) {
-            if (isEquipped(item)) {
-                actionButton.setText("EQUIPPED");
-                actionButton.setEnabled(false);
-            } else {
-                actionButton.setText("SELL (" + (item.price / 2) + ")");
-                actionButton.setEnabled(true);
-            }
+            actionButton.setText(getString(R.string.btn_sell) + " (" + (item.price / 2) + ")");
+            actionButton.setEnabled(true);
         } else {
-            actionButton.setText("BUY (" + item.price + ")");
+            actionButton.setText(getString(R.string.btn_buy) + " (" + item.price + ")");
             actionButton.setEnabled(playerGold >= item.price);
         }
-    }
-
-    private boolean isEquipped(Item item) {
-        SharedPreferences equipPrefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
-        return equipPrefs.getInt(item.slot.name(), -1) == item.id;
     }
 
     public void buyItem() {
@@ -248,7 +261,7 @@ public class ShopActivity extends AppCompatActivity {
         }
         SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         if (itemPrefs.getBoolean("owned_" + selectedItem.id, false)) {
-            Toast.makeText(this, "You already own this!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_already_owned), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -256,7 +269,7 @@ public class ShopActivity extends AppCompatActivity {
         saveGold();
         itemPrefs.edit().putBoolean("owned_" + selectedItem.id, true).commit();
         
-        Toast.makeText(this, "Bought " + selectedItem.name + "!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.toast_bought, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
         itemInfoPanel.setVisibility(View.INVISIBLE);
@@ -265,10 +278,6 @@ public class ShopActivity extends AppCompatActivity {
 
     public void sellItem() {
         if (selectedItem == null) return;
-        if (isEquipped(selectedItem)) {
-            Toast.makeText(this, "Cannot sell equipped item!", Toast.LENGTH_SHORT).show();
-            return;
-        }
         
         playerGold += selectedItem.price / 2;
         saveGold();
@@ -276,7 +285,7 @@ public class ShopActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         prefs.edit().remove("owned_" + selectedItem.id).commit();
         
-        Toast.makeText(this, "Sold " + selectedItem.name + "!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.toast_sold, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
         itemInfoPanel.setVisibility(View.INVISIBLE);

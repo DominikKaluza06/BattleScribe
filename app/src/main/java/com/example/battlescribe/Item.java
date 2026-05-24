@@ -18,8 +18,9 @@ public class Item {
     public Bitmap iconBitmap;
     
     public int price;
+    public int requiredChapter;
 
-    public Item(int id, String name, Bitmap icon, SlotType slot, int strBonus, int vitBonus, int mgcBonus, int agiBonus, int price) {
+    public Item(int id, String name, Bitmap icon, SlotType slot, int strBonus, int vitBonus, int mgcBonus, int agiBonus, int price, int requiredChapter) {
         this.id = id;
         this.name = name;
         this.iconBitmap = icon;
@@ -29,5 +30,6 @@ public class Item {
         this.mgcBonus = mgcBonus;
         this.agiBonus = agiBonus;
         this.price = price;
+        this.requiredChapter = requiredChapter;
     }
 }

@@ -42,6 +42,7 @@ public class BattleActivity extends AppCompatActivity {
     private Handler battleHandler = new Handler();
     private int wave = 1;
     private boolean isInfinite = false;
+    private boolean isStoryMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class BattleActivity extends AppCompatActivity {
 
         wave = getIntent().getIntExtra("WAVE", 1);
         isInfinite = getIntent().getBooleanExtra("IS_INFINITE", false);
+        isStoryMode = getIntent().getBooleanExtra("STORY_MODE", false);
 
         initUI();
         loadPlayerData();
@@ -57,7 +59,16 @@ public class BattleActivity extends AppCompatActivity {
         SkillDB.init(this);
         loadEquippedSkills();
         
-        activeMonster = new Goblin(this, wave);
+        SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
+        int chapter = storyPrefs.getInt("chapter", 1);
+        
+        double difficultyMult = (1 + chapter * 0.3) * Math.pow(wave, 0.5);
+        
+        if (chapter >= 2) {
+            activeMonster = new Skeleton(this, wave, difficultyMult);
+        } else {
+            activeMonster = new Goblin(this, wave, difficultyMult);
+        }
         
         setupBattleUI();
         log(getString(R.string.battle_log_start_wave, wave, activeMonster.name));
@@ -167,7 +178,7 @@ public class BattleActivity extends AppCompatActivity {
         int totalAgi = playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0);
 
         if (skill == null) {
-            int actualDamage = totalStr; // No defense reduction for monsters now as requested
+            int actualDamage = totalStr; 
             activeMonster.takeDamage(totalStr);
             log(getString(R.string.battle_log_player_attack, activeMonster.name, actualDamage));
         } else {
@@ -208,10 +219,10 @@ public class BattleActivity extends AppCompatActivity {
         int finalDamage;
         if (activeMonster.currentMana >= activeMonster.maxMana && activeMonster.maxMana > 0) {
             activeMonster.currentMana -= activeMonster.maxMana;
-            finalDamage = Math.max(1, 15 + (activeMonster.getTotalStr() / 2)); 
+            finalDamage = Math.max(1, (int)(15 * (activeMonster.getMaxHp() / 50.0)) - (playerVit / 2)); 
             log(getString(R.string.battle_log_monster_special, activeMonster.name, "SPECIAL", finalDamage));
         } else {
-            finalDamage = Math.max(1, activeMonster.getTotalStr());
+            finalDamage = Math.max(1, activeMonster.getTotalStr() - (playerVit / 2));
             log(getString(R.string.battle_log_monster_attack, activeMonster.name, finalDamage));
         }
         
@@ -265,10 +276,24 @@ public class BattleActivity extends AppCompatActivity {
 
     private void checkVictory() {
         log(getString(R.string.battle_log_victory, activeMonster.name));
+        
         playerGold += activeMonster.goldReward;
         playerExp += activeMonster.expReward;
         log(getString(R.string.battle_log_rewards, activeMonster.goldReward, activeMonster.expReward));
         
+        if (isStoryMode && activeMonster instanceof Goblin) {
+            SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
+            if (storyPrefs.getInt("chapter", 1) == 1) {
+                storyPrefs.edit().putInt("chapter", 2).putInt("step", 0).apply();
+                log("STORY CHAPTER 2 UNLOCKED!");
+                
+                // Reset Infinite Wave progress because Skeletons are OP
+                getSharedPreferences("BattleProgress", MODE_PRIVATE).edit()
+                        .putInt("infinite_wave", 1).apply();
+                log("Infinite waves reset for new chapter!");
+            }
+        }
+
         int expToLevel = playerLevel * 100;
         while (playerExp >= expToLevel) {
             playerExp -= expToLevel;
@@ -283,7 +308,7 @@ public class BattleActivity extends AppCompatActivity {
             SharedPreferences p = getSharedPreferences("BattleProgress", MODE_PRIVATE);
             if (wave == p.getInt("infinite_wave", 1)) p.edit().putInt("infinite_wave", wave + 1).apply();
         }
-        Toast.makeText(this, R.string.skill_status_ready, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Victory!", Toast.LENGTH_SHORT).show();
         battleHandler.postDelayed(this::finish, 2000);
     }
 

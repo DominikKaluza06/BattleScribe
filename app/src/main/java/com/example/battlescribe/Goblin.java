@@ -4,34 +4,24 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 
 public class Goblin extends Monster {
-    public Goblin(Context context, int level) {
-        // Scaling: 
-        // HP: 30 + 15 per level
-        // STR: 10 + 2 per level
-        // DEF: 1 + 1 per level
-        // MaxMana: 20
-        // ManaRegen: 3 (Special attack every ~7 turns)
-        // Rewards: Scalable Gold (10*L) and EXP (20*L)
+    public Goblin(Context context, int wave, double difficultyMult) {
+        // Base stats for Goblin: 30 HP, 10 STR
         super(
-            "Goblin (Lv " + level + ")", 
-            30 + (level - 1) * 15, 
-            20, 
-            3, 
-            10 + (level - 1) * 2, 
-            1 + (level - 1) * 1, 
-            0, 
-            5, 
+            "Goblin (Lv " + wave + ")", 
+            (int)(30 * difficultyMult), // hp scaled
+            20,                          // mana
+            3,                           // mana regen
+            (int)(10 * difficultyMult), // str scaled
+            (int)(1 * difficultyMult),  // vit (scaling vit for HP/Defense mix)
+            0,                           // mgc
+            5,                           // agi
             BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_dialog_map),
-            10 * level, 
-            20 * level
+            10 * wave,                   // gold reward
+            20 * wave                    // exp reward
         );
-        this.currentMana = 0; // Start at 0 so it has to regen to use special
+        this.currentMana = 0;
         
-        // Material Drops
-        this.materialDrops.put(1, 0.4); // 40% chance for Iron Ore
-        this.materialDrops.put(4, 0.3); // 30% chance for Wood
-        if (level >= 5) {
-            this.materialDrops.put(2, 0.1); // 10% chance for Steel Bar
-        }
+        // Goblins drop Iron Ore
+        this.materialDrops.put(1, 0.4); // 40% Iron Ore
     }
 }

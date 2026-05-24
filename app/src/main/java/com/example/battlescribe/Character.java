@@ -4,11 +4,14 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.DragEvent;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,6 +44,7 @@ public class Character extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_character);
+        hideSystemUI();
 
         tvStatPoints = findViewById(R.id.tv_stat_points);
         tvLevel = findViewById(R.id.tv_level);
@@ -74,6 +78,32 @@ public class Character extends AppCompatActivity {
 
         ItemDB.init(this);
         setupEquipmentDragListeners();
+    }
+
+    private void hideSystemUI() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            final WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
     }
 
     private void setupEquipmentDragListeners() {
@@ -164,6 +194,7 @@ public class Character extends AppCompatActivity {
         getSharedPreferences("CharacterSkills", MODE_PRIVATE).edit().clear().commit();
         getSharedPreferences("BattleProgress", MODE_PRIVATE).edit().clear().commit();
         getSharedPreferences("MaterialInventory", MODE_PRIVATE).edit().clear().commit();
+        getSharedPreferences("StoryProgress", MODE_PRIVATE).edit().clear().commit();
         
         Toast.makeText(this, getString(R.string.toast_reset_fresh), Toast.LENGTH_SHORT).show();
         
@@ -187,10 +218,10 @@ public class Character extends AppCompatActivity {
 
         if (fromEquipSlot) {
             actionButton.setText(R.string.btn_unequip);
-            actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFFF4444)); 
+            actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.RED)); 
         } else {
             actionButton.setText(R.string.btn_equip);
-            actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50)); 
+            actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50"))); 
         }
         actionButton.setEnabled(true);
         actionButton.setAlpha(1.0f);
@@ -203,6 +234,7 @@ public class Character extends AppCompatActivity {
 
     private void loadEquippedItems() {
         SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
+        equippedItems.clear();
         for (SlotType type : SlotType.values()) {
             int itemId = prefs.getInt(type.name(), -1);
             ImageView slotView = findViewById(slotViewIds.get(type));
@@ -222,7 +254,6 @@ public class Character extends AppCompatActivity {
                     }
                 }
             } else {
-                equippedItems.remove(type);
                 if (slotView != null) {
                     slotView.setImageBitmap(null);
                     slotView.setOnClickListener(null);
@@ -351,11 +382,6 @@ public class Character extends AppCompatActivity {
         }
         TextView pageView = findViewById(R.id.INVsitePage);
         if (pageView != null) pageView.setText((currentPage + 1) + "/3");
-    }
-
-    private boolean isEquipped(Item item) {
-        SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
-        return prefs.getInt(item.slot.name(), -1) == item.id;
     }
 
     public void INVnextPage(View view) {

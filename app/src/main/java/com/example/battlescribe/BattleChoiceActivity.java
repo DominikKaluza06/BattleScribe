@@ -23,9 +23,10 @@ public class BattleChoiceActivity extends AppCompatActivity {
         loadWaveProgress();
         setupNavigation();
 
-        findViewById(R.id.btn_continue_story).setOnClickListener(v -> 
-            Toast.makeText(this, "Story Mode coming soon!", Toast.LENGTH_SHORT).show()
-        );
+        findViewById(R.id.btn_continue_story).setOnClickListener(v -> {
+            Intent intent = new Intent(BattleChoiceActivity.this, StoryActivity.class);
+            startActivity(intent);
+        });
 
         updateBattleButton();
     }
@@ -98,9 +99,9 @@ public class BattleChoiceActivity extends AppCompatActivity {
             startActivity(intent);
         });
         findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+            // Intent intent = new Intent(this, CraftingActivity.class);
+            // intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            // startActivity(intent);
         });
     }
 }

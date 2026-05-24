@@ -1,16 +1,22 @@
 package com.example.battlescribe;
 
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.DragEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Character extends AppCompatActivity {
 
@@ -67,6 +73,56 @@ public class Character extends AppCompatActivity {
         slotViewIds.put(SlotType.RING, R.id.ring_slot);
 
         ItemDB.init(this);
+        setupEquipmentDragListeners();
+    }
+
+    private void setupEquipmentDragListeners() {
+        View.OnDragListener dragListener = new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        v.setAlpha(0.5f);
+                        return true;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        v.setAlpha(1.0f);
+                        return true;
+                    case DragEvent.ACTION_DROP:
+                        ClipData.Item data = event.getClipData().getItemAt(0);
+                        int itemId = Integer.parseInt(data.getText().toString());
+                        Item draggedItem = ItemDB.getItem(itemId);
+
+                        SlotType targetSlot = null;
+                        for (Map.Entry<SlotType, Integer> entry : slotViewIds.entrySet()) {
+                            if (entry.getValue().equals(v.getId())) {
+                                targetSlot = entry.getKey();
+                                break;
+                            }
+                        }
+
+                        if (draggedItem != null && targetSlot != null) {
+                            if (draggedItem.slot == targetSlot) {
+                                equipItem(draggedItem);
+                                return true;
+                            } else {
+                                Toast.makeText(Character.this, "Wrong slot type!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        return false;
+                }
+                return false;
+            }
+        };
+
+        for (Integer resId : slotViewIds.values()) {
+            View view = findViewById(resId);
+            if (view != null) {
+                view.setOnDragListener(dragListener);
+            }
+        }
     }
 
     private void setupNavigation() {
@@ -131,22 +187,13 @@ public class Character extends AppCompatActivity {
 
         if (fromEquipSlot) {
             actionButton.setText(R.string.btn_unequip);
-            actionButton.setEnabled(true);
-            actionButton.setAlpha(1.0f);
             actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFFF4444)); 
         } else {
+            actionButton.setText(R.string.btn_equip);
             actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50)); 
-            SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
-            if (prefs.getInt(item.slot.name(), -1) == item.id) {
-                actionButton.setText(R.string.btn_equipped);
-                actionButton.setEnabled(false);
-                actionButton.setAlpha(0.5f);
-            } else {
-                actionButton.setText(R.string.btn_equip);
-                actionButton.setEnabled(true);
-                actionButton.setAlpha(1.0f);
-            }
         }
+        actionButton.setEnabled(true);
+        actionButton.setAlpha(1.0f);
     }
 
     private void hideItemInfo() {
@@ -175,6 +222,7 @@ public class Character extends AppCompatActivity {
                     }
                 }
             } else {
+                equippedItems.remove(type);
                 if (slotView != null) {
                     slotView.setImageBitmap(null);
                     slotView.setOnClickListener(null);
@@ -184,18 +232,18 @@ public class Character extends AppCompatActivity {
     }
 
     private void equipItem(Item item) {
-        equippedItems.put(item.slot, item);
         SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
         prefs.edit().putInt(item.slot.name(), item.id).apply();
         loadEquippedItems();
+        loadInventory(); // Refresh to remove from list
         refreshStatsUI();
     }
 
     private void unequipItem(Item item) {
-        equippedItems.remove(item.slot);
         SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
         prefs.edit().remove(item.slot.name()).apply();
         loadEquippedItems();
+        loadInventory(); // Refresh to add back to list
         refreshStatsUI();
     }
 
@@ -249,13 +297,23 @@ public class Character extends AppCompatActivity {
 
     private void loadInventory() {
         for (int i = 0; i < 24; i++) inventory[i] = null;
-        SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+        SharedPreferences itemsPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+        SharedPreferences equipPrefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
+        
+        Set<Integer> equippedIds = new HashSet<>();
+        for (SlotType type : SlotType.values()) {
+            int id = equipPrefs.getInt(type.name(), -1);
+            if (id != -1) equippedIds.add(id);
+        }
+
         int index = 0;
         for (Item item : ItemDB.getAllItems()) {
-            if (prefs.getBoolean("owned_" + item.id, false)) {
-                if (index < 24) {
-                    inventory[index] = item;
-                    index++;
+            if (itemsPrefs.getBoolean("owned_" + item.id, false)) {
+                if (!equippedIds.contains(item.id)) {
+                    if (index < 24) {
+                        inventory[index] = item;
+                        index++;
+                    }
                 }
             }
         }
@@ -272,11 +330,23 @@ public class Character extends AppCompatActivity {
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
                 slot.setVisibility(View.VISIBLE);
-                slot.setAlpha(isEquipped(item) ? 0.5f : 1.0f);
+                slot.setAlpha(1.0f);
                 slot.setOnClickListener(v -> showItemInfo(item, false));
+                
+                // Add long click listener for dragging
+                slot.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        ClipData.Item clipItem = new ClipData.Item(String.valueOf(item.id));
+                        ClipData dragData = new ClipData(item.name, new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, clipItem);
+                        v.startDragAndDrop(dragData, new View.DragShadowBuilder(v), null, 0);
+                        return true;
+                    }
+                });
             } else {
                 slot.setImageBitmap(null);
                 slot.setOnClickListener(null);
+                slot.setOnLongClickListener(null);
             }
         }
         TextView pageView = findViewById(R.id.INVsitePage);

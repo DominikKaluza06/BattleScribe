@@ -15,7 +15,6 @@
         android:background="#AA000000"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -442,7 +441,6 @@
         app:layout_constraintEnd_toEndOf="@+id/inventory_background_img"
         app:layout_constraintStart_toStartOf="@+id/inventory_background_img" />
 
-    <!-- Item Description Panel (Hidden by default, appears over inventory) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/char_item_info_panel"
         android:layout_width="0dp"

@@ -15,23 +15,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Core battle activity that handles the turn-based combat system (CTB),
+ * damage calculations, critical hits, and player/monster interactions.
+ */
 public class BattleActivity extends AppCompatActivity {
 
+    // --- Monster UI and Data ---
     private Monster activeMonster;
     private ImageView monsterIcon;
     private TextView monsterName;
     private ProgressBar monsterHpBar, monsterManaBar;
     private TextView tvMonsterHp, tvMonsterMana;
 
+    // --- Player Data ---
     private int playerMaxHp, playerCurrentHp, playerMaxMana, playerCurrentMana;
     private int playerStr, playerVit, playerMgc, playerAgi;
     private int playerGold, playerExp, playerLevel, playerStatPoints;
-    private int playerCharge = 0; // CTB Charge
+    
+    /**
+     * Charge meter for the CTB (Charge Time Battle) system.
+     * When it reaches 100, the player takes a turn.
+     */
+    private int playerCharge = 0; 
+    
     private Item equippedWeapon;
     private Map<SlotType, Item> equippedItems = new HashMap<>();
     private List<Skill> equippedSkills = new ArrayList<>();
     private Map<Integer, Integer> currentCooldowns = new HashMap<>();
 
+    // --- Player UI ---
     private TextView playerName;
     private ProgressBar playerHpBar, playerManaBar;
     private TextView tvPlayerHp, tvPlayerMana;
@@ -40,6 +53,7 @@ public class BattleActivity extends AppCompatActivity {
     private ImageView[] skillSlots = new ImageView[4];
     private TextView[] skillCdTexts = new TextView[4];
 
+    // --- Logic Utilities ---
     private TextView battleLog;
     private boolean isPlayerTurn = false; 
     private Handler battleHandler = new Handler();
@@ -52,6 +66,7 @@ public class BattleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
 
+        // Extract settings from the intent that launched this battle
         isAdventureMode = getIntent().getBooleanExtra("IS_ADVENTURE", false);
         isStoryMode = getIntent().getBooleanExtra("STORY_MODE", false);
         String monsterType = getIntent().getStringExtra("MONSTER_TYPE");
@@ -63,9 +78,11 @@ public class BattleActivity extends AppCompatActivity {
         loadPlayerData();
         loadEquippedSkills();
         
+        // In Adventure Mode, monsters match the player's level
         int monsterLevel = playerLevel;
         double difficultyMult = 1.0;
         
+        // Spawn the target enemy
         if (isStoryMode) {
             activeMonster = new Goblin(this, 1, 1.0);
         } else if (isAdventureMode) {
@@ -87,8 +104,13 @@ public class BattleActivity extends AppCompatActivity {
         setupBattleUI();
         log(getString(R.string.battle_log_start, activeMonster.name));
         
-        // Start the CTB loop
-        battleHandler.postDelayed(this::processCTB, 1000);
+        // Kick off the Charge Time loop
+        battleHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                processCTB();
+            }
+        }, 1000);
     }
 
     private void initUI() {
@@ -119,9 +141,18 @@ public class BattleActivity extends AppCompatActivity {
             }
         }
 
-        btnBasicAttack.setOnClickListener(v -> handlePlayerAction(null));
+        // Basic attack listener
+        btnBasicAttack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handlePlayerAction(null);
+            }
+        });
     }
 
+    /**
+     * Loads player stats and computes max HP/Mana based on current attributes.
+     */
     private void loadPlayerData() {
         SharedPreferences statsPrefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
         playerStr = statsPrefs.getInt("str", 10);
@@ -134,21 +165,18 @@ public class BattleActivity extends AppCompatActivity {
         playerStatPoints = statsPrefs.getInt("statPoints", 0);
 
         SharedPreferences equipPrefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
-        int totalStrBonus = 0;
         int totalVitBonus = 0;
         int totalMgcBonus = 0;
-        int totalAgiBonus = 0;
 
+        // Iterate through all slots to sum up bonuses
         for (SlotType type : SlotType.values()) {
             int itemId = equipPrefs.getInt(type.name(), -1);
             if (itemId != -1) {
                 Item item = ItemDB.getItem(itemId);
                 if (item != null) {
                     equippedItems.put(type, item);
-                    totalStrBonus += item.strBonus;
                     totalVitBonus += item.vitBonus;
                     totalMgcBonus += item.mgcBonus;
-                    totalAgiBonus += item.agiBonus;
                     if (type == SlotType.WEAPON) {
                         equippedWeapon = item;
                         btnBasicAttack.setImageBitmap(item.iconBitmap);
@@ -161,36 +189,45 @@ public class BattleActivity extends AppCompatActivity {
             btnBasicAttack.setImageResource(android.R.drawable.ic_menu_send);
         }
         
-        // Stats scaling updated:
-        // VIT: +10 Max HP, +1 Defense
-        // MGC: +3 Max Mana, Scales Magic Skills, Scales Mana Regen
+        // Calculate dynamic limits
         int totalVit = playerVit + totalVitBonus;
         int totalMgc = playerMgc + totalMgcBonus;
         
-        // Base HP is 50 at starting VIT (10)
+        // Formula: Base 50 HP at 10 VIT, +10 HP per extra point
         playerMaxHp = 50 + (totalVit - 10) * 10;
         playerCurrentHp = playerMaxHp;
         
-        // Base Mana is 20 + 3 per MGC
+        // Formula: Base 20 Mana, +3 per MGC point
         playerMaxMana = 20 + (totalMgc * 3);
         playerCurrentMana = playerMaxMana;
     }
 
+    /**
+     * Checks which skills are marked as equipped in storage and prepares them for battle.
+     */
     private void loadEquippedSkills() {
         SharedPreferences skillPrefs = getSharedPreferences("CharacterSkills", MODE_PRIVATE);
         List<Skill> allSkills = SkillDB.getAllSkills();
         int slotIndex = 0;
-        for (Skill skill : allSkills) {
+        for (final Skill skill : allSkills) {
             if (skillPrefs.getBoolean("equipped_" + skill.id, false) && slotIndex < 4) {
                 equippedSkills.add(skill);
                 currentCooldowns.put(skill.id, 0);
+                
                 if (skillContainers[slotIndex] != null) {
                     skillContainers[slotIndex].setVisibility(View.VISIBLE);
                 }
+                
                 skillSlots[slotIndex].setVisibility(View.VISIBLE);
                 skillSlots[slotIndex].setImageBitmap(skill.iconBitmap);
-                final Skill s = skill;
-                skillSlots[slotIndex].setOnClickListener(v -> handlePlayerAction(s));
+                
+                // Listener for specific skill slot
+                skillSlots[slotIndex].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        handlePlayerAction(skill);
+                    }
+                });
                 slotIndex++;
             }
         }
@@ -214,35 +251,46 @@ public class BattleActivity extends AppCompatActivity {
         battleLog.append("\n" + message);
     }
 
+    /**
+     * CTB Processing: Increments charge values based on speed.
+     * Speed is derived from Agility.
+     */
     private void processCTB() {
         if (activeMonster.isDead() || playerCurrentHp <= 0) return;
 
-        // Player total stats for speed
+        // Player total agility including equipment
         int totalAgi = playerAgi;
-        for (Item item : equippedItems.values()) totalAgi += item.agiBonus;
+        for (Item item : equippedItems.values()) {
+            totalAgi += item.agiBonus;
+        }
         
-        // Speed: 10 base + 1 per AGI
         int pSpeed = 10 + totalAgi; 
-        int mSpeed = activeMonster.getSpeed(); // Already nerfed to 10 + AGI/2 in Entity.java
+        int mSpeed = activeMonster.getSpeed(); 
 
+        // Loop until someone hits the 100 charge threshold
         while (playerCharge < 100 && activeMonster.getCurrentCharge() < 100) {
             playerCharge += pSpeed;
             activeMonster.addCharge(mSpeed);
         }
 
         if (playerCharge >= 100) {
-            playerCharge -= 100;
+            playerCharge -= 100; // Deduct cost of turn
             isPlayerTurn = true;
             log(getString(R.string.battle_log_your_turn));
         } else {
-            activeMonster.reduceCharge(100);
+            activeMonster.reduceCharge(100); // Deduct cost of turn
             monsterTurn();
         }
     }
 
+    /**
+     * Executes player's chosen action.
+     * @param skill Null for basic attack, otherwise uses the selected Skill.
+     */
     private void handlePlayerAction(Skill skill) {
         if (!isPlayerTurn || activeMonster.isDead() || playerCurrentHp <= 0) return;
 
+        // Total stats calculation
         int tStr = playerStr;
         int tVit = playerVit;
         int tMgc = playerMgc;
@@ -254,21 +302,25 @@ public class BattleActivity extends AppCompatActivity {
             tAgi += item.agiBonus;
         }
 
-        // Crit logic: Agility adds crit chance, Strength adds crit damage
+        // Critical Hit logic:
+        // AGI -> Increases Crit Chance (0.5% per point)
+        // STR -> Increases Crit Damage (150% base + 1% per point)
         double critChance = tAgi * 0.005;
         double critMult = 1.5 + (tStr * 0.01);
         boolean isCrit = rnd.nextDouble() < critChance;
 
         if (skill == null) {
+            // Basic Weapon Attack
             int baseDamage = tStr;
             int finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
-            // Monster defense is 0 as per instructions
+            
             activeMonster.takeDamage(finalDamage);
-            int actualDamage = finalDamage; 
-            String msg = getString(R.string.battle_log_player_attack, activeMonster.name, actualDamage);
+            
+            String msg = getString(R.string.battle_log_player_attack, activeMonster.name, finalDamage);
             if (isCrit) msg = "CRITICAL! " + msg;
             log(msg);
         } else {
+            // Player Skill Usage
             if (currentCooldowns.get(skill.id) > 0) {
                 Toast.makeText(this, getString(R.string.toast_skill_on_cooldown), Toast.LENGTH_SHORT).show();
                 return;
@@ -280,16 +332,17 @@ public class BattleActivity extends AppCompatActivity {
             playerCurrentMana -= skill.manaCost;
             currentCooldowns.put(skill.id, skill.cooldown);
             
-            // Magic increases magic skill damage
             int skillValue = skill.calculateValue(tStr, tVit, tMgc, tAgi, playerMaxHp);
+            
             if (skill.name.toLowerCase().contains("heal")) {
+                // Healing Skill
                 playerCurrentHp = Math.min(playerMaxHp, playerCurrentHp + skillValue);
                 log(getString(R.string.battle_log_player_heal, skillValue));
             } else {
+                // Damage Skill
                 int finalDamage = (int)(skillValue * (isCrit ? critMult : 1.0));
                 activeMonster.takeDamage(finalDamage);
-                int actualDamage = finalDamage;
-                String msg = getString(R.string.battle_log_player_skill, skill.name, actualDamage);
+                String msg = getString(R.string.battle_log_player_skill, skill.name, finalDamage);
                 if (isCrit) msg = "CRITICAL! " + msg;
                 log(msg);
             }
@@ -297,17 +350,29 @@ public class BattleActivity extends AppCompatActivity {
 
         updateBars();
         updateSkillIcons();
-        if (activeMonster.isDead()) checkVictory();
-        else {
+        
+        if (activeMonster.isDead()) {
+            checkVictory();
+        } else {
             isPlayerTurn = false;
-            battleHandler.postDelayed(this::processCTB, 1000);
+            // Return to timing loop
+            battleHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    processCTB();
+                }
+            }, 1000);
         }
     }
 
+    /**
+     * Logic for the AI monster's turn.
+     * Damage is reduced by player's Vitality (1 Defense per VIT).
+     */
     private void monsterTurn() {
         if (activeMonster.isDead() || playerCurrentHp <= 0) return;
 
-        // Player total stats for defense calculation
+        // Player total VIT for defense
         int tVit = playerVit;
         int tMgc = playerMgc;
         for (Item item : equippedItems.values()) {
@@ -315,31 +380,33 @@ public class BattleActivity extends AppCompatActivity {
             tMgc += item.mgcBonus;
         }
 
-        // Monster Crit logic
         boolean isCrit = rnd.nextDouble() < activeMonster.getCritChance();
         double critMult = activeMonster.getCritMultiplier();
 
         int damageToDeal;
         if (activeMonster.currentMana >= activeMonster.maxMana && activeMonster.maxMana > 0) {
+            // Special Attack when mana is full
             activeMonster.currentMana -= activeMonster.maxMana;
             int baseDamage = (int)(15 * (activeMonster.getMaxHp() / 50.0));
             damageToDeal = (int)(baseDamage * (isCrit ? critMult : 1.0));
-            int actualDamage = Math.max(1, damageToDeal - tVit); // 1 VIT = 1 Defense
+            int actualDamage = Math.max(1, damageToDeal - tVit); 
             log((isCrit ? "CRITICAL! " : "") + getString(R.string.battle_log_monster_special, activeMonster.name, "SPECIAL", actualDamage));
             playerCurrentHp -= actualDamage;
         } else {
+            // Standard Monster Attack
             int baseDamage = activeMonster.getTotalStr();
             damageToDeal = (int)(baseDamage * (isCrit ? critMult : 1.0));
-            int actualDamage = Math.max(1, damageToDeal - tVit); // 1 VIT = 1 Defense
+            int actualDamage = Math.max(1, damageToDeal - tVit);
             log((isCrit ? "CRITICAL! " : "") + getString(R.string.battle_log_monster_attack, activeMonster.name, actualDamage));
             playerCurrentHp -= actualDamage;
         }
         
-        // Mana regen scales with MGC
+        // Mana regeneration logic
         int playerManaRegen = 2 + (tMgc / 5);
         playerCurrentMana = Math.min(playerMaxMana, playerCurrentMana + playerManaRegen);
         activeMonster.currentMana = Math.min(activeMonster.maxMana, activeMonster.currentMana + activeMonster.manaRegen);
         
+        // Cooldown ticking
         for (Integer skillId : currentCooldowns.keySet()) {
             int cd = currentCooldowns.get(skillId);
             if (cd > 0) currentCooldowns.put(skillId, cd - 1);
@@ -347,9 +414,17 @@ public class BattleActivity extends AppCompatActivity {
         
         updateBars();
         updateSkillIcons();
-        if (playerCurrentHp <= 0) checkDefeat();
-        else {
-            battleHandler.postDelayed(this::processCTB, 1000);
+        
+        if (playerCurrentHp <= 0) {
+            checkDefeat();
+        } else {
+            // Return to timing loop
+            battleHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    processCTB();
+                }
+            }, 1000);
         }
     }
 
@@ -380,6 +455,9 @@ public class BattleActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Rewards the player upon victory and checks for level ups.
+     */
     private void checkVictory() {
         log(getString(R.string.battle_log_victory, activeMonster.name));
         
@@ -387,7 +465,7 @@ public class BattleActivity extends AppCompatActivity {
         playerExp += activeMonster.expReward;
         log(getString(R.string.battle_log_rewards, activeMonster.goldReward, activeMonster.expReward));
         
-        // Material drops logic
+        // Handle monster item drops
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
         SharedPreferences.Editor matEditor = matPrefs.edit();
         for (Map.Entry<Integer, Double> drop : activeMonster.materialDrops.entrySet()) {
@@ -403,6 +481,7 @@ public class BattleActivity extends AppCompatActivity {
         }
         matEditor.apply();
 
+        // Advance story if applicable
         if (isStoryMode && activeMonster instanceof Goblin) {
             SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
             if (storyPrefs.getInt("chapter", 1) == 1) {
@@ -411,6 +490,7 @@ public class BattleActivity extends AppCompatActivity {
             }
         }
 
+        // Check for Level Up (Threshold: Level * 100 EXP)
         int expToLevel = playerLevel * 100;
         while (playerExp >= expToLevel) {
             playerExp -= expToLevel;
@@ -422,18 +502,34 @@ public class BattleActivity extends AppCompatActivity {
 
         savePlayerData();
         Toast.makeText(this, "Victory!", Toast.LENGTH_SHORT).show();
-        battleHandler.postDelayed(this::finish, 2000);
+        
+        battleHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        }, 2000);
     }
 
     private void savePlayerData() {
         getSharedPreferences("CharacterStats", MODE_PRIVATE).edit()
-            .putInt("gold", playerGold).putInt("exp", playerExp).putInt("level", playerLevel).putInt("statPoints", playerStatPoints).commit();
+            .putInt("gold", playerGold)
+            .putInt("exp", playerExp)
+            .putInt("level", playerLevel)
+            .putInt("statPoints", playerStatPoints)
+            .commit();
     }
 
     private void checkDefeat() {
         playerCurrentHp = 0;
         log(getString(R.string.battle_log_defeat));
         Toast.makeText(this, R.string.battle_log_defeat, Toast.LENGTH_LONG).show();
-        battleHandler.postDelayed(this::finish, 2000);
+        
+        battleHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        }, 2000);
     }
 }

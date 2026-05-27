@@ -7,26 +7,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the player character.
+ * This class handles loading stats and equipment from persistent storage
+ * and calculates total attributes including bonuses from gear.
+ */
 public class Player extends Entity {
 
+    // Storage for items currently equipped in each slot
     private Map<SlotType, Item> equipment = new HashMap<>();
+    
+    // List of skills the player has selected for use in battle
     private List<Skill> equippedSkills = new ArrayList<>();
 
     public Player(String name, Context context) {
-        // Initializing with base 100 HP and base 10 stats
-        super(name, 100, 10, 10, 10, 10);
+        // Initializing with base 50 HP (at level 1) and base 10 stats
+        super(name, 50, 10, 10, 10, 10);
         loadStatsAndEquipment(context);
     }
 
+    /**
+     * Reads all character data from SharedPreferences and updates the instance.
+     */
     private void loadStatsAndEquipment(Context context) {
-        // 1. Load Base Stats from SharedPreferences
+        // 1. Load Base Attributes
         SharedPreferences statsPrefs = context.getSharedPreferences("CharacterStats", Context.MODE_PRIVATE);
         this.baseStr = statsPrefs.getInt("str", 10);
-        this.baseVit = statsPrefs.getInt("vit", 10); // Renamed from def
+        this.baseVit = statsPrefs.getInt("vit", 10); 
         this.baseMgc = statsPrefs.getInt("mgc", 10);
         this.baseAgi = statsPrefs.getInt("agi", 10);
 
-        // 2. Load Equipped Items
+        // 2. Load Equipped Items and map them to SlotTypes
         SharedPreferences equipPrefs = context.getSharedPreferences("EquippedItems", Context.MODE_PRIVATE);
         for (SlotType type : SlotType.values()) {
             int itemId = equipPrefs.getInt(type.name(), -1);
@@ -38,7 +49,7 @@ public class Player extends Entity {
             }
         }
 
-        // 3. Load Equipped Skills
+        // 3. Filter skills to find which ones the player has chosen to equip
         SharedPreferences skillPrefs = context.getSharedPreferences("CharacterSkills", Context.MODE_PRIVATE);
         equippedSkills.clear();
         for (Skill skill : SkillDB.getAllSkills()) {
@@ -47,13 +58,16 @@ public class Player extends Entity {
             }
         }
         
-        // After loading stats and items, reset currentHp to the new MaxHp
+        // Ensure HP is full after loading state
         this.currentHp = getMaxHp();
     }
 
     public List<Skill> getEquippedSkills() {
         return equippedSkills;
     }
+
+    // --- Dynamic Stat Calculations ---
+    // These methods sum up the base stats with all active equipment bonuses.
 
     @Override
     public int getTotalStr() {
@@ -92,7 +106,7 @@ public class Player extends Entity {
     
     @Override
     public int getMaxHp() {
-        // Vitality increases max HP: Base 100 + 10 per total Vitality
-        return 100 + (getTotalVit() * 10);
+        // Player HP Formula: Base 50 at 10 VIT, +10 HP for every point above 10.
+        return 50 + (getTotalVit() - 10) * 10;
     }
 }

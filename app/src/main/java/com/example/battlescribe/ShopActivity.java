@@ -14,22 +14,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Activity for the in-game Shop.
+ * Players can purchase equipment based on story progress and sell items they own.
+ */
 public class ShopActivity extends AppCompatActivity {
 
+    // Arrays to store items for the current page
     private Item[] shopItems = new Item[24];
     private Item[] inventoryItems = new Item[24];
     private int currentPage = 0;
     private Item selectedItem = null;
-    private boolean isSelling = false;
+    private boolean isSelling = false; // Toggle to distinguish between buying and selling logic
     private int playerGold = 0;
     
     private TextView tvGold;
 
+    // View IDs for the 8 slots in the shop display grid
     private final int[] shopSlotIds = {
             R.id.shop_slot1, R.id.shop_slot2, R.id.shop_slot3, R.id.shop_slot4,
             R.id.shop_slot5, R.id.shop_slot6, R.id.shop_slot7, R.id.shop_slot8
     };
 
+    // View IDs for the 8 slots in the selling (inventory) display grid
     private final int[] sellSlotIds = {
             R.id.sell_slot1, R.id.sell_slot2, R.id.sell_slot3, R.id.sell_slot4,
             R.id.sell_slot5, R.id.sell_slot6, R.id.sell_slot7, R.id.sell_slot8
@@ -47,13 +54,15 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         hideSystemUI();
 
+        // Initialize UI components
         tvGold = findViewById(R.id.tv_gold);
         itemInfoPanel = findViewById(R.id.item_info_panel);
-        selectedItemIcon = findViewById(R.id.selected_item_icon);
-        selectedItemName = findViewById(R.id.selected_item_name);
-        selectedItemDesc = findViewById(R.id.selected_item_desc);
+        selectedItemIcon = findViewById(R.id.selected_char_item_icon);
+        selectedItemName = findViewById(R.id.selected_char_item_name);
+        selectedItemDesc = findViewById(R.id.selected_char_item_desc);
         actionButton = findViewById(R.id.action_button);
 
+        // Standard OnClickListener for the Buy/Sell button
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,12 +76,16 @@ public class ShopActivity extends AppCompatActivity {
 
         setupNavigation();
 
+        // Initialize database and load initial state
         ItemDB.init(this);
         loadPlayerData();
         loadShopItems();
         loadInventory();
     }
 
+    /**
+     * Hides the Android system bars for an immersive fullscreen experience.
+     */
     private void hideSystemUI() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             final WindowInsetsController controller = getWindow().getInsetsController();
@@ -99,29 +112,44 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Connects bottom navigation icons to their respective activities.
+     */
     private void setupNavigation() {
-        findViewById(R.id.character).setOnClickListener(v -> {
-            Intent intent = new Intent(this, Character.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.character).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShopActivity.this, Character.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
         
-        findViewById(R.id.skills).setOnClickListener(v -> {
-            Intent intent = new Intent(this, SkillsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.skills).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShopActivity.this, SkillsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
 
-        findViewById(R.id.adventure).setOnClickListener(v -> {
-            Intent intent = new Intent(this, BattleChoiceActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.adventure).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShopActivity.this, BattleChoiceActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
 
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.crafting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShopActivity.this, CraftingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
     }
 
@@ -147,6 +175,9 @@ public class ShopActivity extends AppCompatActivity {
         selectedItem = null;
     }
 
+    /**
+     * Filters all items from the database and only displays those available to the player's chapter.
+     */
     private void loadShopItems() {
         for (int i = 0; i < 24; i++) shopItems[i] = null;
         SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
@@ -163,6 +194,9 @@ public class ShopActivity extends AppCompatActivity {
         updateShopUI();
     }
 
+    /**
+     * Loads items the player owns into the selling list, excluding currently equipped ones.
+     */
     private void loadInventory() {
         for (int i = 0; i < 24; i++) inventoryItems[i] = null;
         SharedPreferences itemsPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
@@ -188,6 +222,9 @@ public class ShopActivity extends AppCompatActivity {
         updateInventoryUI();
     }
 
+    /**
+     * Updates the shop grid views with item icons and click listeners.
+     */
     private void updateShopUI() {
         int startOffset = currentPage * 8;
         for (int i = 0; i < 8; i++) {
@@ -196,7 +233,12 @@ public class ShopActivity extends AppCompatActivity {
             final Item item = (itemIndex < shopItems.length) ? shopItems[itemIndex] : null;
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
-                slot.setOnClickListener(v -> showItemDescription(item, false));
+                slot.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showItemDescription(item, false);
+                    }
+                });
             } else {
                 slot.setImageBitmap(null);
                 slot.setOnClickListener(null);
@@ -206,6 +248,9 @@ public class ShopActivity extends AppCompatActivity {
         if (pageText != null) pageText.setText((currentPage + 1) + "/3");
     }
 
+    /**
+     * Updates the inventory sell-grid views with item icons and click listeners.
+     */
     private void updateInventoryUI() {
         int startOffset = currentPage * 8;
         for (int i = 0; i < 8; i++) {
@@ -215,7 +260,12 @@ public class ShopActivity extends AppCompatActivity {
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
                 slot.setAlpha(1.0f);
-                slot.setOnClickListener(v -> showItemDescription(item, true));
+                slot.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showItemDescription(item, true);
+                    }
+                });
             } else {
                 slot.setImageBitmap(null);
                 slot.setOnClickListener(null);
@@ -223,39 +273,67 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    private void showItemDescription(Item item, boolean isSellMode) {
+    /**
+     * Prepares the item details panel for display.
+     * Calculates the correct price for buying (100%) vs selling (50%).
+     */
+    private void showItemDescription(final Item item, final boolean isSellMode) {
         selectedItem = item;
         this.isSelling = isSellMode;
         itemInfoPanel.setVisibility(View.VISIBLE);
         selectedItemIcon.setImageBitmap(item.iconBitmap);
         selectedItemName.setText(item.name);
-        String desc = "Price: " + (isSellMode ? item.price / 2 : item.price) + " Gold\n" +
-                     "STR: +" + item.strBonus + " | " + "VIT: +" + item.vitBonus + "\n" +
-                     "MGC: +" + item.mgcBonus + " | " + "AGI: +" + item.agiBonus;
-        selectedItemDesc.setText(desc);
+        
+        int displayPrice = isSellMode ? item.price / 2 : item.price;
+        
+        StringBuilder desc = new StringBuilder();
+        desc.append("Price: ").append(displayPrice).append(" Gold\n");
+        desc.append(formatStat("STR", item.strBonus)).append(" | ");
+        desc.append(formatStat("VIT", item.vitBonus)).append("\n");
+        desc.append(formatStat("MGC", item.mgcBonus)).append(" | ");
+        desc.append(formatStat("AGI", item.agiBonus));
+        
+        selectedItemDesc.setText(desc.toString());
+        
         if (isSellMode) {
-            actionButton.setText(getString(R.string.btn_sell) + " (" + (item.price / 2) + ")");
+            actionButton.setText(getString(R.string.btn_sell) + " (" + displayPrice + ")");
             actionButton.setEnabled(true);
         } else {
-            actionButton.setText(getString(R.string.btn_buy) + " (" + item.price + ")");
+            actionButton.setText(getString(R.string.btn_buy) + " (" + displayPrice + ")");
             actionButton.setEnabled(playerGold >= item.price);
         }
     }
 
+    /**
+     * Formats bonus stats with a '+' sign for positive values.
+     */
+    private String formatStat(String label, int value) {
+        if (value > 0) return label + ": +" + value;
+        if (value < 0) return label + ": " + value;
+        return label + ": 0";
+    }
+
+    /**
+     * Logic for purchasing an item. Checks gold and marks it as owned.
+     */
     public void buyItem() {
         if (selectedItem == null) return;
+        
         if (playerGold < selectedItem.price) {
             Toast.makeText(this, "Not enough gold!", Toast.LENGTH_SHORT).show();
             return;
         }
+        
         SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         if (itemPrefs.getBoolean("owned_" + selectedItem.id, false)) {
             Toast.makeText(this, getString(R.string.toast_already_owned), Toast.LENGTH_SHORT).show();
             return;
         }
+        
         playerGold -= selectedItem.price;
         saveGold();
         itemPrefs.edit().putBoolean("owned_" + selectedItem.id, true).commit();
+        
         Toast.makeText(this, getString(R.string.toast_bought, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
@@ -263,12 +341,18 @@ public class ShopActivity extends AppCompatActivity {
         selectedItem = null;
     }
 
+    /**
+     * Logic for selling an item. Adds half price gold and removes ownership.
+     */
     public void sellItem() {
         if (selectedItem == null) return;
+        
         playerGold += selectedItem.price / 2;
         saveGold();
+        
         SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         prefs.edit().remove("owned_" + selectedItem.id).commit();
+        
         Toast.makeText(this, getString(R.string.toast_sold, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
@@ -280,6 +364,9 @@ public class ShopActivity extends AppCompatActivity {
         getSharedPreferences("CharacterStats", MODE_PRIVATE).edit().putInt("gold", playerGold).apply();
     }
 
+    /**
+     * Switches to the next page of the shop/inventory catalog.
+     */
     public void SHOPnextPage(View view) {
         if (currentPage < 2) {
             currentPage++;
@@ -289,6 +376,9 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Switches to the previous page of the shop/inventory catalog.
+     */
     public void SHOPprevPage(View view) {
         if (currentPage > 0) {
             currentPage--;

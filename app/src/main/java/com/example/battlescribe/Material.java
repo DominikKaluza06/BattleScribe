@@ -2,6 +2,10 @@ package com.example.battlescribe;
 
 import android.graphics.Bitmap;
 
+/**
+ * Simple data container for crafting materials.
+ * Stores the identity and visual icon of a raw resource (e.g., Iron Ore).
+ */
 public class Material {
     public int id;
     public String name;

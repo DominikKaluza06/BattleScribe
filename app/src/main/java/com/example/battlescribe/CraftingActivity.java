@@ -17,8 +17,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Activity for crafting items using gathered materials.
+ * It displays recipes and their requirements, allowing players to create new gear.
+ */
 public class CraftingActivity extends AppCompatActivity {
 
+    // View IDs for the 8 slots in the recipe selection grid
     private final int[] recipeSlotIds = {
             R.id.recipe_slot1, R.id.recipe_slot2, R.id.recipe_slot3, R.id.recipe_slot4,
             R.id.recipe_slot5, R.id.recipe_slot6, R.id.recipe_slot7, R.id.recipe_slot8
@@ -37,11 +42,13 @@ public class CraftingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_crafting);
         hideSystemUI();
 
+        // Initialize UI components
         craftingPanel = findViewById(R.id.crafting_panel);
         selectedRecipeName = findViewById(R.id.selected_recipe_name);
         requirementsContainer = findViewById(R.id.requirements_container);
         btnCraft = findViewById(R.id.btn_craft);
 
+        // Ensure all databases are initialized before use
         ItemDB.init(this);
         MaterialDB.init(this);
         RecipeDB.init(this);
@@ -49,9 +56,18 @@ public class CraftingActivity extends AppCompatActivity {
         setupRecipes();
         setupNavigation();
 
-        btnCraft.setOnClickListener(v -> craftItem());
+        // Standard OnClickListener replacing lambda expression
+        btnCraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                craftItem();
+            }
+        });
     }
 
+    /**
+     * Hides system bars for a full-screen game experience.
+     */
     private void hideSystemUI() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             final WindowInsetsController controller = getWindow().getInsetsController();
@@ -78,17 +94,26 @@ public class CraftingActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Dynamically populates the recipe grid with item icons.
+     */
     private void setupRecipes() {
         List<Recipe> recipes = RecipeDB.getAllRecipes();
         for (int i = 0; i < recipeSlotIds.length; i++) {
             ImageView slot = findViewById(recipeSlotIds[i]);
             if (i < recipes.size()) {
-                Recipe recipe = recipes.get(i);
+                final Recipe recipe = recipes.get(i);
                 Item resultItem = ItemDB.getItem(recipe.resultItemId);
                 if (resultItem != null) {
                     slot.setImageBitmap(resultItem.iconBitmap);
                     slot.setVisibility(View.VISIBLE);
-                    slot.setOnClickListener(v -> showRecipe(recipe));
+                    // Click to view recipe details
+                    slot.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            showRecipe(recipe);
+                        }
+                    });
                 }
             } else {
                 slot.setVisibility(View.GONE);
@@ -96,6 +121,10 @@ public class CraftingActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates the UI to show required materials for the selected item.
+     * Checks availability of materials in player's inventory.
+     */
     private void showRecipe(Recipe recipe) {
         selectedRecipe = recipe;
         Item item = ItemDB.getItem(recipe.resultItemId);
@@ -110,6 +139,7 @@ public class CraftingActivity extends AppCompatActivity {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             int required = entry.getValue();
             
+            // Build visual requirement indicator
             LinearLayout matLayout = new LinearLayout(this);
             matLayout.setOrientation(LinearLayout.VERTICAL);
             matLayout.setGravity(Gravity.CENTER);
@@ -122,26 +152,33 @@ public class CraftingActivity extends AppCompatActivity {
             
             TextView tv = new TextView(this);
             tv.setText(owned + "/" + required);
-            tv.setTextColor(owned >= required ? Color.WHITE : Color.RED); // Changed to white/red
+            // Change text color to red if materials are insufficient
+            tv.setTextColor(owned >= required ? Color.WHITE : Color.RED); 
             tv.setGravity(Gravity.CENTER);
 
             matLayout.addView(iv);
             matLayout.addView(tv);
             requirementsContainer.addView(matLayout);
 
-            if (owned < required) canCraft = false;
+            if (owned < required) {
+                canCraft = false;
+            }
         }
         
         btnCraft.setEnabled(canCraft);
         craftingPanel.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Finalizes the crafting process: deducts materials and grants the item.
+     */
     private void craftItem() {
         if (selectedRecipe == null) return;
         
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
         SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         
+        // Final validation of material quantities
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             if (owned < entry.getValue()) {
@@ -150,6 +187,7 @@ public class CraftingActivity extends AppCompatActivity {
             }
         }
 
+        // Deduct materials from inventory
         SharedPreferences.Editor editor = matPrefs.edit();
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
@@ -157,32 +195,51 @@ public class CraftingActivity extends AppCompatActivity {
         }
         editor.apply();
 
+        // Mark the resulting item as owned by the player
         itemPrefs.edit().putBoolean("owned_" + selectedRecipe.resultItemId, true).apply();
         
         Toast.makeText(this, "Crafted " + ItemDB.getItem(selectedRecipe.resultItemId).name + "!", Toast.LENGTH_SHORT).show();
-        showRecipe(selectedRecipe);
+        showRecipe(selectedRecipe); // Refresh UI state
     }
 
+    /**
+     * Connects bottom navigation buttons manually (standard anonymous classes).
+     */
     private void setupNavigation() {
-        findViewById(R.id.shop).setOnClickListener(v -> {
-            Intent intent = new Intent(this, ShopActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.shop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CraftingActivity.this, ShopActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.skills).setOnClickListener(v -> {
-            Intent intent = new Intent(this, SkillsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        
+        findViewById(R.id.skills).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CraftingActivity.this, SkillsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.adventure).setOnClickListener(v -> {
-            Intent intent = new Intent(this, BattleChoiceActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        
+        findViewById(R.id.adventure).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CraftingActivity.this, BattleChoiceActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.character).setOnClickListener(v -> {
-            Intent intent = new Intent(this, Character.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        
+        findViewById(R.id.character).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CraftingActivity.this, Character.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
     }
 }

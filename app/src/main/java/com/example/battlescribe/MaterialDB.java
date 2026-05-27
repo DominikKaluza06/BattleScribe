@@ -6,14 +6,16 @@ import android.graphics.BitmapFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Database class for raw materials used in crafting.
+ */
 public class MaterialDB {
     private static final Map<Integer, Material> allMaterials = new HashMap<>();
 
     public static void init(Context context) {
         if (!allMaterials.isEmpty()) return;
 
-        // For now, using placeholders or existing drawables if available
-        // In a real scenario, we might have a materials sprite sheet
+        // Use a generic placeholder icon for all materials for now
         Bitmap placeholder = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_help);
 
         addMaterial(new Material(1, "Iron Ore", placeholder));

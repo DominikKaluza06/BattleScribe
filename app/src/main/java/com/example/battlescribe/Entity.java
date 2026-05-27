@@ -1,18 +1,22 @@
 package com.example.battlescribe;
 
+/**
+ * Base class for all living entities (Players and Monsters).
+ * Manages core statistics, health, and combat-related calculations.
+ */
 public abstract class Entity {
     protected String name;
     protected int maxHp;
     protected int currentHp;
 
-    // Stats
-    protected int baseStr;
-    protected int baseVit;
-    protected int baseMgc;
-    protected int baseAgi;
+    // Core statistics
+    protected int baseStr; // Increases damage and critical hit damage
+    protected int baseVit; // Increases HP and physical defense
+    protected int baseMgc; // Increases mana, mana regen, and skill effectiveness
+    protected int baseAgi; // Increases speed and critical hit chance
 
-    // CTB System
-    protected int currentCharge = 0;
+    // Charge Time Battle (CTB) system variables
+    protected int currentCharge = 0; // Ticks up based on speed; grants turn at 100
 
     public Entity(String name, int maxHp, int baseStr, int baseVit, int baseMgc, int baseAgi) {
         this.name = name;
@@ -30,9 +34,10 @@ public abstract class Entity {
     public int getTotalMgc() { return baseMgc; }
     public int getTotalAgi() { return baseAgi; }
 
-    // Speed for CTB: Base 10
-    // Players: 1 AGI = 1 Speed
-    // Monsters: 2 AGI = 1 Speed (Nerfed)
+    /**
+     * Calculates speed for the CTB system.
+     * Monsters gain speed twice as slowly from Agility to prevent them from becoming too fast.
+     */
     public int getSpeed() {
         if (this instanceof Monster) {
             return 10 + (getTotalAgi() / 2);
@@ -40,20 +45,29 @@ public abstract class Entity {
         return 10 + getTotalAgi();
     }
 
-    // Defense: Only players get defense from VIT (1 VIT = 1 Defense)
+    /**
+     * Calculates physical damage reduction.
+     * Monsters have "nerfed" defense: they only get 1/3 of the defense value from VIT compared to players.
+     */
     public int getDefense() {
         if (this instanceof Monster) {
-            return 0;
+            return getTotalVit() / 3; 
         }
-        return getTotalVit();
+        return getTotalVit(); // Player: 1 VIT = 1 Defense
     }
 
-    // Crit Chance: 0.5% per AGI point
+    /**
+     * Calculates the probability of a critical hit.
+     * Returns decimal value (e.g. 0.05 = 5%).
+     */
     public double getCritChance() {
         return getTotalAgi() * 0.005;
     }
 
-    // Crit Multiplier: 1.5x base + 1% per STR point
+    /**
+     * Calculates damage multiplier for critical hits.
+     * Base is 150%, increases with Strength.
+     */
     public double getCritMultiplier() {
         return 1.5 + (getTotalStr() * 0.01);
     }
@@ -65,8 +79,11 @@ public abstract class Entity {
 
     public boolean isAlive() { return currentHp > 0; }
 
+    /**
+     * Standard method to handle taking damage, accounting for defense.
+     * Guaranteed minimum of 1 damage.
+     */
     public void takeDamage(int amount) {
-        // Damage is reduced by defense
         int damageAfterDefense = Math.max(1, amount - getDefense());
         this.currentHp -= damageAfterDefense;
         if (this.currentHp < 0) this.currentHp = 0;

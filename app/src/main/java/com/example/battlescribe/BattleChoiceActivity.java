@@ -13,6 +13,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Random;
 
+/**
+ * Activity for selecting the battle mode (Story or Adventure) and specific biomes.
+ * Manages the transitions between different selection steps using visibility toggles.
+ */
 public class BattleChoiceActivity extends AppCompatActivity {
 
     private int infiniteWave = 1;
@@ -29,9 +33,11 @@ public class BattleChoiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_battle_choice);
         hideSystemUI();
 
+        // Bind layout containers for the three-step selection process
         layoutMainChoice = findViewById(R.id.layout_main_choice);
         layoutBiomeSelection = findViewById(R.id.layout_biome_selection);
         layoutBiomeActions = findViewById(R.id.layout_biome_actions);
+        
         tvBiomeName = findViewById(R.id.tv_biome_name);
         btnBiomeFight = findViewById(R.id.btn_biome_fight);
         btnBiomeLeave = findViewById(R.id.btn_biome_leave);
@@ -39,25 +45,59 @@ public class BattleChoiceActivity extends AppCompatActivity {
         loadWaveProgress();
         setupNavigation();
 
-        findViewById(R.id.btn_continue_story).setOnClickListener(v -> {
-            Intent intent = new Intent(BattleChoiceActivity.this, StoryActivity.class);
-            startActivity(intent);
+        // Story Mode button
+        findViewById(R.id.btn_continue_story).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BattleChoiceActivity.this, StoryActivity.class);
+                startActivity(intent);
+            }
         });
 
-        // Main to Biomes
-        findViewById(R.id.btn_to_biomes).setOnClickListener(v -> showBiomeSelection());
+        // Step 1: Main Menu to Biome Selection
+        findViewById(R.id.btn_to_biomes).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBiomeSelection();
+            }
+        });
 
-        // Back from Biomes to Main
-        findViewById(R.id.btn_back_to_main).setOnClickListener(v -> showMainChoice());
+        // Step 2: Back from Biomes to Main Menu
+        findViewById(R.id.btn_back_to_main).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMainChoice();
+            }
+        });
 
-        // Forest Biome Click
-        findViewById(R.id.btn_enter_forest).setOnClickListener(v -> showBiomeActions("DARK FOREST"));
+        // Step 2: Selecting the Forest biome
+        findViewById(R.id.btn_enter_forest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBiomeActions("DARK FOREST");
+            }
+        });
 
-        // Biome Actions
-        btnBiomeFight.setOnClickListener(v -> startRandomBattle());
-        btnBiomeLeave.setOnClickListener(v -> showBiomeSelection());
+        // Step 3: Action - Start the actual battle
+        btnBiomeFight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRandomBattle();
+            }
+        });
+
+        // Step 3: Action - Leave the biome back to selection
+        btnBiomeLeave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBiomeSelection();
+            }
+        });
     }
 
+    /**
+     * Standard utility to hide status and navigation bars for fullscreen immersion.
+     */
     private void hideSystemUI() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             final WindowInsetsController controller = getWindow().getInsetsController();
@@ -95,6 +135,8 @@ public class BattleChoiceActivity extends AppCompatActivity {
         infiniteWave = prefs.getInt("infinite_wave", 1);
     }
 
+    // --- Layout Visibility Management ---
+
     private void showBiomeSelection() {
         layoutMainChoice.setVisibility(View.GONE);
         layoutBiomeSelection.setVisibility(View.VISIBLE);
@@ -114,36 +156,54 @@ public class BattleChoiceActivity extends AppCompatActivity {
         layoutBiomeActions.setVisibility(View.GONE);
     }
 
+    /**
+     * Logic for entering combat. Picks a monster type randomly and starts the BattleActivity.
+     */
     private void startRandomBattle() {
         Random rnd = new Random();
         boolean isSkeleton = rnd.nextBoolean();
         
         Intent intent = new Intent(this, BattleActivity.class);
-        intent.putExtra("IS_ADVENTURE", true);
+        intent.putExtra("IS_ADVENTURE", true); // Flag for level-scaling logic
         intent.putExtra("MONSTER_TYPE", isSkeleton ? "SKELETON" : "ZOMBIE");
         startActivity(intent);
     }
 
+    /**
+     * Links bottom navigation icons to their respective activities.
+     */
     private void setupNavigation() {
-        findViewById(R.id.character).setOnClickListener(v -> {
-            Intent intent = new Intent(this, Character.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.character).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BattleChoiceActivity.this, Character.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.shop).setOnClickListener(v -> {
-            Intent intent = new Intent(this, ShopActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.shop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BattleChoiceActivity.this, ShopActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.skills).setOnClickListener(v -> {
-            Intent intent = new Intent(this, SkillsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.skills).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BattleChoiceActivity.this, SkillsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.crafting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BattleChoiceActivity.this, CraftingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
     }
 }

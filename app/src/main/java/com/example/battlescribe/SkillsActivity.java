@@ -17,6 +17,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Activity for managing and equipping player skills.
+ * Allows equipping up to 4 skills that have been unlocked by level.
+ */
 public class SkillsActivity extends AppCompatActivity {
 
     private static final int MAX_EQUIPPED_SKILLS = 4;
@@ -64,23 +68,27 @@ public class SkillsActivity extends AppCompatActivity {
         displaySkills();
     }
 
+    /**
+     * Dynamically populates the skill list from the database.
+     * Checks requirements and equipment status.
+     */
     private void displaySkills() {
         LinearLayout container = findViewById(R.id.skills_container);
         container.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
 
         List<Skill> skills = SkillDB.getAllSkills();
-        SharedPreferences skillPrefs = getSharedPreferences("CharacterSkills", MODE_PRIVATE);
+        final SharedPreferences skillPrefs = getSharedPreferences("CharacterSkills", MODE_PRIVATE);
         SharedPreferences statsPrefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
         int playerLevel = statsPrefs.getInt("level", 1);
 
-        for (Skill skill : skills) {
+        for (final Skill skill : skills) {
             View skillView = inflater.inflate(R.layout.skill_item, container, false);
 
             ImageView icon = skillView.findViewById(R.id.skill_icon);
             TextView name = skillView.findViewById(R.id.skill_name);
             TextView desc = skillView.findViewById(R.id.skill_desc);
-            Button btnAction = skillView.findViewById(R.id.btn_skill_action);
+            final Button btnAction = skillView.findViewById(R.id.btn_skill_action);
             TextView tvRequirement = skillView.findViewById(R.id.tv_skill_requirement);
 
             icon.setImageBitmap(skill.iconBitmap);
@@ -90,6 +98,7 @@ public class SkillsActivity extends AppCompatActivity {
             boolean isEquipped = skillPrefs.getBoolean("equipped_" + skill.id, false);
             boolean isLevelMet = playerLevel >= skill.requiredLevel;
 
+            // Handle skill locking based on player level
             if (!isLevelMet) {
                 btnAction.setVisibility(View.GONE);
                 tvRequirement.setVisibility(View.VISIBLE);
@@ -100,17 +109,22 @@ public class SkillsActivity extends AppCompatActivity {
                 updateButtonState(btnAction, isEquipped);
             }
 
-            btnAction.setOnClickListener(v -> {
-                boolean currentlyEquipped = skillPrefs.getBoolean("equipped_" + skill.id, false);
-                if (currentlyEquipped) {
-                    skillPrefs.edit().putBoolean("equipped_" + skill.id, false).apply();
-                    updateButtonState(btnAction, false);
-                } else {
-                    if (getEquippedCount(skillPrefs) < MAX_EQUIPPED_SKILLS) {
-                        skillPrefs.edit().putBoolean("equipped_" + skill.id, true).apply();
-                        updateButtonState(btnAction, true);
+            btnAction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean currentlyEquipped = skillPrefs.getBoolean("equipped_" + skill.id, false);
+                    if (currentlyEquipped) {
+                        // Unequip logic
+                        skillPrefs.edit().putBoolean("equipped_" + skill.id, false).apply();
+                        updateButtonState(btnAction, false);
                     } else {
-                        Toast.makeText(this, getString(R.string.toast_max_skills), Toast.LENGTH_SHORT).show();
+                        // Equip logic with limit check
+                        if (getEquippedCount(skillPrefs) < MAX_EQUIPPED_SKILLS) {
+                            skillPrefs.edit().putBoolean("equipped_" + skill.id, true).apply();
+                            updateButtonState(btnAction, true);
+                        } else {
+                            Toast.makeText(SkillsActivity.this, getString(R.string.toast_max_skills), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             });
@@ -119,17 +133,25 @@ public class SkillsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Iterates through preferences to find how many skills are currently toggled on.
+     */
     private int getEquippedCount(SharedPreferences prefs) {
         int count = 0;
         Map<String, ?> allEntries = prefs.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
             if (entry.getKey().startsWith("equipped_") && entry.getValue() instanceof Boolean) {
-                if ((Boolean) entry.getValue()) count++;
+                if ((Boolean) entry.getValue()) {
+                    count++;
+                }
             }
         }
         return count;
     }
 
+    /**
+     * Changes button appearance based on whether a skill is equipped.
+     */
     private void updateButtonState(Button btn, boolean isEquipped) {
         if (isEquipped) {
             btn.setText(R.string.btn_unequip);
@@ -141,25 +163,37 @@ public class SkillsActivity extends AppCompatActivity {
     }
 
     private void setupNavigation() {
-        findViewById(R.id.character).setOnClickListener(v -> {
-            Intent intent = new Intent(this, Character.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.character).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SkillsActivity.this, Character.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.shop).setOnClickListener(v -> {
-            Intent intent = new Intent(this, ShopActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.shop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SkillsActivity.this, ShopActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.adventure).setOnClickListener(v -> {
-            Intent intent = new Intent(this, BattleChoiceActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.adventure).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SkillsActivity.this, BattleChoiceActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.crafting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SkillsActivity.this, CraftingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
     }
 }

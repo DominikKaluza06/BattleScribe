@@ -21,11 +21,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Character Activity: Manages equipment, inventory, and stat point allocation.
+ * Includes a drag-and-drop system for equipping items.
+ */
 public class Character extends AppCompatActivity {
 
+    // Maps to track equipped items and their corresponding UI slots
     private Map<SlotType, Item> equippedItems = new HashMap<>();
     private Map<SlotType, Integer> slotViewIds = new HashMap<>();
     
+    // UI elements for the item detail panel
     private View itemInfoPanel;
     private ImageView selectedItemIcon;
     private TextView selectedItemName;
@@ -46,6 +52,7 @@ public class Character extends AppCompatActivity {
         setContentView(R.layout.activity_character);
         hideSystemUI();
 
+        // Initialize stat and info views
         tvStatPoints = findViewById(R.id.tv_stat_points);
         tvLevel = findViewById(R.id.tv_level);
         tvCharGold = findViewById(R.id.tv_char_gold);
@@ -55,21 +62,32 @@ public class Character extends AppCompatActivity {
         selectedItemDesc = findViewById(R.id.selected_char_item_desc);
         actionButton = findViewById(R.id.char_item_action_button);
         
-        findViewById(R.id.char_item_close_button).setOnClickListener(v -> hideItemInfo());
-        
-        actionButton.setOnClickListener(v -> {
-            if (selectedItem != null) {
-                if (selectedFromEquipSlot) {
-                    unequipItem(selectedItem);
-                } else {
-                    equipItem(selectedItem);
-                }
+        // Listener for closing the item detail view
+        findViewById(R.id.char_item_close_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 hideItemInfo();
+            }
+        });
+        
+        // Context-aware button: Equips if from inventory, Unequips if already worn
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedItem != null) {
+                    if (selectedFromEquipSlot) {
+                        unequipItem(selectedItem);
+                    } else {
+                        equipItem(selectedItem);
+                    }
+                    hideItemInfo();
+                }
             }
         });
 
         setupNavigation();
 
+        // Link logical slots to XML layout IDs
         slotViewIds.put(SlotType.WEAPON, R.id.weapon_slot);
         slotViewIds.put(SlotType.HELMET, R.id.helmet_slot);
         slotViewIds.put(SlotType.ARMOR, R.id.armor_slot);
@@ -80,6 +98,9 @@ public class Character extends AppCompatActivity {
         setupEquipmentDragListeners();
     }
 
+    /**
+     * Standard fullscreen immersive mode setup.
+     */
     private void hideSystemUI() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             final WindowInsetsController controller = getWindow().getInsetsController();
@@ -106,6 +127,10 @@ public class Character extends AppCompatActivity {
         }
     }
 
+    /**
+     * Logic for the drag-and-drop equipment system.
+     * Items are identified by their ID during the drag process.
+     */
     private void setupEquipmentDragListeners() {
         View.OnDragListener dragListener = new View.OnDragListener() {
             @Override
@@ -121,10 +146,12 @@ public class Character extends AppCompatActivity {
                         v.setAlpha(1.0f);
                         return true;
                     case DragEvent.ACTION_DROP:
+                        // Extract Item ID from the drag data
                         ClipData.Item data = event.getClipData().getItemAt(0);
                         int itemId = Integer.parseInt(data.getText().toString());
                         Item draggedItem = ItemDB.getItem(itemId);
 
+                        // Find which slot the item was dropped onto
                         SlotType targetSlot = null;
                         for (Map.Entry<SlotType, Integer> entry : slotViewIds.entrySet()) {
                             if (entry.getValue().equals(v.getId())) {
@@ -133,6 +160,7 @@ public class Character extends AppCompatActivity {
                             }
                         }
 
+                        // Verify slot compatibility
                         if (draggedItem != null && targetSlot != null) {
                             if (draggedItem.slot == targetSlot) {
                                 equipItem(draggedItem);
@@ -147,6 +175,7 @@ public class Character extends AppCompatActivity {
             }
         };
 
+        // Attach the listener to every equipment slot view
         for (Integer resId : slotViewIds.values()) {
             View view = findViewById(resId);
             if (view != null) {
@@ -156,28 +185,40 @@ public class Character extends AppCompatActivity {
     }
 
     private void setupNavigation() {
-        findViewById(R.id.shop).setOnClickListener(v -> {
-            Intent intent = new Intent(Character.this, ShopActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.shop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Character.this, ShopActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
         
-        findViewById(R.id.skills).setOnClickListener(v -> {
-            Intent intent = new Intent(Character.this, SkillsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.skills).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Character.this, SkillsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
 
-        findViewById(R.id.adventure).setOnClickListener(v -> {
-            Intent intent = new Intent(Character.this, BattleChoiceActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.adventure).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Character.this, BattleChoiceActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
 
-        findViewById(R.id.crafting).setOnClickListener(v -> {
-            Intent intent = new Intent(Character.this, CraftingActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+        findViewById(R.id.crafting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Character.this, CraftingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
         });
     }
 
@@ -190,6 +231,9 @@ public class Character extends AppCompatActivity {
         hideItemInfo();
     }
 
+    /**
+     * Wipes all persistent data for a fresh start.
+     */
     public void resetGame(View view) {
         getSharedPreferences("CharacterStats", MODE_PRIVATE).edit().clear().commit();
         getSharedPreferences("CharacterItems", MODE_PRIVATE).edit().clear().commit();
@@ -207,16 +251,19 @@ public class Character extends AppCompatActivity {
         hideItemInfo();
     }
 
-    private void showItemInfo(Item item, boolean fromEquipSlot) {
+    /**
+     * Prepares and shows the item description panel.
+     */
+    private void showItemInfo(final Item item, boolean fromEquipSlot) {
         selectedItem = item;
         selectedFromEquipSlot = fromEquipSlot;
         itemInfoPanel.setVisibility(View.VISIBLE);
         selectedItemIcon.setImageBitmap(item.iconBitmap);
         selectedItemName.setText(item.name);
         
+        // Build readable stat string
         StringBuilder desc = new StringBuilder();
         desc.append("Slot: ").append(item.slot.name()).append("\n");
-        
         desc.append(formatStat(getString(R.string.label_str), item.strBonus)).append(" | ");
         desc.append(formatStat(getString(R.string.label_vit), item.vitBonus)).append("\n");
         desc.append(formatStat(getString(R.string.label_mgc), item.mgcBonus)).append(" | ");
@@ -224,6 +271,7 @@ public class Character extends AppCompatActivity {
         
         selectedItemDesc.setText(desc.toString());
 
+        // Visual distinction between equipping and unequipping
         if (fromEquipSlot) {
             actionButton.setText(R.string.btn_unequip);
             actionButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.RED)); 
@@ -235,6 +283,9 @@ public class Character extends AppCompatActivity {
         actionButton.setAlpha(1.0f);
     }
 
+    /**
+     * Formats stat values for the UI, ensuring proper sign handling (+/-).
+     */
     private String formatStat(String label, int value) {
         if (value > 0) return getString(R.string.stat_format_plus, label, value);
         if (value < 0) return getString(R.string.stat_format_minus, label, value);
@@ -246,20 +297,28 @@ public class Character extends AppCompatActivity {
         selectedItem = null;
     }
 
+    /**
+     * Reads equipped items from storage and updates the visual slots.
+     */
     private void loadEquippedItems() {
         SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
         equippedItems.clear();
-        for (SlotType type : SlotType.values()) {
+        for (final SlotType type : SlotType.values()) {
             int itemId = prefs.getInt(type.name(), -1);
             ImageView slotView = findViewById(slotViewIds.get(type));
             
             if (itemId != -1) {
-                Item item = ItemDB.getItem(itemId);
+                final Item item = ItemDB.getItem(itemId);
                 if (item != null) {
                     equippedItems.put(type, item);
                     if (slotView != null) {
                         slotView.setImageBitmap(item.iconBitmap);
-                        slotView.setOnClickListener(v -> showItemInfo(item, true));
+                        slotView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showItemInfo(item, true);
+                            }
+                        });
                     }
                 } else {
                     if (slotView != null) {
@@ -281,7 +340,7 @@ public class Character extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
         prefs.edit().putInt(item.slot.name(), item.id).apply();
         loadEquippedItems();
-        loadInventory(); // Refresh to remove from list
+        loadInventory(); // Refresh grids
         refreshStatsUI();
     }
 
@@ -289,10 +348,13 @@ public class Character extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
         prefs.edit().remove(item.slot.name()).apply();
         loadEquippedItems();
-        loadInventory(); // Refresh to add back to list
+        loadInventory(); // Refresh grids
         refreshStatsUI();
     }
 
+    /**
+     * Updates text views to show current base attributes and character level.
+     */
     private void refreshStatsUI() {
         SharedPreferences prefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
         int baseStr = prefs.getInt("str", 10);
@@ -313,6 +375,9 @@ public class Character extends AppCompatActivity {
         if (tvCharGold != null) tvCharGold.setText(getString(R.string.label_gold, gold));
     }
 
+    /**
+     * Allocates a free stat point to the specified attribute.
+     */
     private void spendStatPoint(String statKey) {
         SharedPreferences prefs = getSharedPreferences("CharacterStats", MODE_PRIVATE);
         int currentPoints = prefs.getInt("statPoints", 0);
@@ -329,6 +394,7 @@ public class Character extends AppCompatActivity {
         }
     }
 
+    // Public click handlers for stat buttons defined in XML
     public void increaseStr(View view) { spendStatPoint("str"); }
     public void increaseVit(View view) { spendStatPoint("vit"); }
     public void increaseMgc(View view) { spendStatPoint("mgc"); }
@@ -336,11 +402,14 @@ public class Character extends AppCompatActivity {
 
     private Item[] inventory = new Item[24];
     private int currentPage = 0;
-    private final int[] slotIds = {
+    private final int[] inventoryGridIds = {
             R.id.weapon_slot1, R.id.weapon_slot2, R.id.weapon_slot3, R.id.weapon_slot4,
             R.id.weapon_slot5, R.id.weapon_slot6, R.id.weapon_slot7, R.id.weapon_slot8
     };
 
+    /**
+     * Loads unequipped items the player owns into the inventory array.
+     */
     private void loadInventory() {
         for (int i = 0; i < 24; i++) inventory[i] = null;
         SharedPreferences itemsPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
@@ -366,20 +435,29 @@ public class Character extends AppCompatActivity {
         updateInventoryUI();
     }
 
+    /**
+     * Renders the current page of the inventory grid.
+     */
     private void updateInventoryUI() {
         int startOffset = currentPage * 8;
         for (int i = 0; i < 8; i++) {
-            ImageView slot = findViewById(slotIds[i]);
+            ImageView slot = findViewById(inventoryGridIds[i]);
             if (slot == null) continue;
             int inventoryIndex = startOffset + i;
             final Item item = (inventoryIndex < inventory.length) ? inventory[inventoryIndex] : null;
+            
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
                 slot.setVisibility(View.VISIBLE);
                 slot.setAlpha(1.0f);
-                slot.setOnClickListener(v -> showItemInfo(item, false));
+                slot.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showItemInfo(item, false);
+                    }
+                });
                 
-                // Add long click listener for dragging
+                // Initialize the drag shadow and data when long-pressing an item
                 slot.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {

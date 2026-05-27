@@ -11,10 +11,10 @@
     <string name="label_gold">Gold: %1$d</string>
     <string name="label_level">Level: %1$d</string>
     <string name="label_stat_points">Stat Points: %1$d</string>
-    <string name="label_str">STR:</string>
-    <string name="label_vit">VIT:</string>
-    <string name="label_mgc">MGC:</string>
-    <string name="label_agi">AGI:</string>
+    <string name="label_str">STR</string>
+    <string name="label_vit">VIT</string>
+    <string name="label_mgc">MGC</string>
+    <string name="label_agi">AGI</string>
     <string name="label_equipment">EQUIPMENT:</string>
     <string name="label_items_for_sale">ITEMS FOR SALE:</string>
     <string name="label_your_inventory">YOUR INVENTORY:</string>
@@ -22,6 +22,11 @@
     <string name="label_required_materials">Required Materials:</string>
     <string name="label_hp_format">%1$d/%2$d</string>
     <string name="label_mana_format">%1$d/%2$d</string>
+
+    <!-- Stat Formatting -->
+    <string name="stat_format_plus">%1$s: +%2$d</string>
+    <string name="stat_format_minus">%1$s: %2$d</string>
+    <string name="stat_format_zero">%1$s: 0</string>
 
     <!-- Buttons -->
     <string name="btn_reset">RESET</string>

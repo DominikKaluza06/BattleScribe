@@ -28,6 +28,7 @@ public class BattleActivity extends AppCompatActivity {
     private int playerGold, playerExp, playerLevel, playerStatPoints;
     private int playerCharge = 0; // CTB Charge
     private Item equippedWeapon;
+    private Map<SlotType, Item> equippedItems = new HashMap<>();
     private List<Skill> equippedSkills = new ArrayList<>();
     private Map<Integer, Integer> currentCooldowns = new HashMap<>();
 
@@ -56,10 +57,10 @@ public class BattleActivity extends AppCompatActivity {
         String monsterType = getIntent().getStringExtra("MONSTER_TYPE");
 
         initUI();
-        loadPlayerData();
         ItemDB.init(this);
         SkillDB.init(this);
         MaterialDB.init(this);
+        loadPlayerData();
         loadEquippedSkills();
         
         int monsterLevel = playerLevel;
@@ -133,17 +134,45 @@ public class BattleActivity extends AppCompatActivity {
         playerStatPoints = statsPrefs.getInt("statPoints", 0);
 
         SharedPreferences equipPrefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
-        int weaponId = equipPrefs.getInt(SlotType.WEAPON.name(), -1);
-        if (weaponId != -1) {
-            equippedWeapon = ItemDB.getItem(weaponId);
-            if (equippedWeapon != null) btnBasicAttack.setImageBitmap(equippedWeapon.iconBitmap);
-        } else {
+        int totalStrBonus = 0;
+        int totalVitBonus = 0;
+        int totalMgcBonus = 0;
+        int totalAgiBonus = 0;
+
+        for (SlotType type : SlotType.values()) {
+            int itemId = equipPrefs.getInt(type.name(), -1);
+            if (itemId != -1) {
+                Item item = ItemDB.getItem(itemId);
+                if (item != null) {
+                    equippedItems.put(type, item);
+                    totalStrBonus += item.strBonus;
+                    totalVitBonus += item.vitBonus;
+                    totalMgcBonus += item.mgcBonus;
+                    totalAgiBonus += item.agiBonus;
+                    if (type == SlotType.WEAPON) {
+                        equippedWeapon = item;
+                        btnBasicAttack.setImageBitmap(item.iconBitmap);
+                    }
+                }
+            }
+        }
+        
+        if (equippedWeapon == null) {
             btnBasicAttack.setImageResource(android.R.drawable.ic_menu_send);
         }
         
-        playerMaxHp = 100 + (playerVit * 10);
+        // Stats scaling updated:
+        // VIT: +10 Max HP, +1 Defense
+        // MGC: +3 Max Mana, Scales Magic Skills, Scales Mana Regen
+        int totalVit = playerVit + totalVitBonus;
+        int totalMgc = playerMgc + totalMgcBonus;
+        
+        // Base HP is 50 at starting VIT (10)
+        playerMaxHp = 50 + (totalVit - 10) * 10;
         playerCurrentHp = playerMaxHp;
-        playerMaxMana = 20 + (playerMgc * 3);
+        
+        // Base Mana is 20 + 3 per MGC
+        playerMaxMana = 20 + (totalMgc * 3);
         playerCurrentMana = playerMaxMana;
     }
 
@@ -188,8 +217,13 @@ public class BattleActivity extends AppCompatActivity {
     private void processCTB() {
         if (activeMonster.isDead() || playerCurrentHp <= 0) return;
 
-        int pSpeed = 10 + (playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0));
-        int mSpeed = activeMonster.getSpeed();
+        // Player total stats for speed
+        int totalAgi = playerAgi;
+        for (Item item : equippedItems.values()) totalAgi += item.agiBonus;
+        
+        // Speed: 10 base + 1 per AGI
+        int pSpeed = 10 + totalAgi; 
+        int mSpeed = activeMonster.getSpeed(); // Already nerfed to 10 + AGI/2 in Entity.java
 
         while (playerCharge < 100 && activeMonster.getCurrentCharge() < 100) {
             playerCharge += pSpeed;
@@ -201,7 +235,7 @@ public class BattleActivity extends AppCompatActivity {
             isPlayerTurn = true;
             log(getString(R.string.battle_log_your_turn));
         } else {
-            activeMonster.addCharge(-100); // Reduce by 100 instead of resetting
+            activeMonster.reduceCharge(100);
             monsterTurn();
         }
     }
@@ -209,12 +243,18 @@ public class BattleActivity extends AppCompatActivity {
     private void handlePlayerAction(Skill skill) {
         if (!isPlayerTurn || activeMonster.isDead() || playerCurrentHp <= 0) return;
 
-        int tStr = playerStr + (equippedWeapon != null ? equippedWeapon.strBonus : 0);
-        int tVit = playerVit + (equippedWeapon != null ? equippedWeapon.vitBonus : 0);
-        int tMgc = playerMgc + (equippedWeapon != null ? equippedWeapon.mgcBonus : 0);
-        int tAgi = playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0);
+        int tStr = playerStr;
+        int tVit = playerVit;
+        int tMgc = playerMgc;
+        int tAgi = playerAgi;
+        for (Item item : equippedItems.values()) {
+            tStr += item.strBonus;
+            tVit += item.vitBonus;
+            tMgc += item.mgcBonus;
+            tAgi += item.agiBonus;
+        }
 
-        // Crit logic
+        // Crit logic: Agility adds crit chance, Strength adds crit damage
         double critChance = tAgi * 0.005;
         double critMult = 1.5 + (tStr * 0.01);
         boolean isCrit = rnd.nextDouble() < critChance;
@@ -222,8 +262,9 @@ public class BattleActivity extends AppCompatActivity {
         if (skill == null) {
             int baseDamage = tStr;
             int finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
-            int actualDamage = Math.max(1, finalDamage - activeMonster.getTotalVit()); 
+            // Monster defense is 0 as per instructions
             activeMonster.takeDamage(finalDamage);
+            int actualDamage = finalDamage; 
             String msg = getString(R.string.battle_log_player_attack, activeMonster.name, actualDamage);
             if (isCrit) msg = "CRITICAL! " + msg;
             log(msg);
@@ -239,14 +280,15 @@ public class BattleActivity extends AppCompatActivity {
             playerCurrentMana -= skill.manaCost;
             currentCooldowns.put(skill.id, skill.cooldown);
             
+            // Magic increases magic skill damage
             int skillValue = skill.calculateValue(tStr, tVit, tMgc, tAgi, playerMaxHp);
             if (skill.name.toLowerCase().contains("heal")) {
                 playerCurrentHp = Math.min(playerMaxHp, playerCurrentHp + skillValue);
                 log(getString(R.string.battle_log_player_heal, skillValue));
             } else {
                 int finalDamage = (int)(skillValue * (isCrit ? critMult : 1.0));
-                int actualDamage = Math.max(1, finalDamage - activeMonster.getTotalVit());
                 activeMonster.takeDamage(finalDamage);
+                int actualDamage = finalDamage;
                 String msg = getString(R.string.battle_log_player_skill, skill.name, actualDamage);
                 if (isCrit) msg = "CRITICAL! " + msg;
                 log(msg);
@@ -265,27 +307,36 @@ public class BattleActivity extends AppCompatActivity {
     private void monsterTurn() {
         if (activeMonster.isDead() || playerCurrentHp <= 0) return;
 
+        // Player total stats for defense calculation
+        int tVit = playerVit;
+        int tMgc = playerMgc;
+        for (Item item : equippedItems.values()) {
+            tVit += item.vitBonus;
+            tMgc += item.mgcBonus;
+        }
+
         // Monster Crit logic
         boolean isCrit = rnd.nextDouble() < activeMonster.getCritChance();
         double critMult = activeMonster.getCritMultiplier();
 
-        int finalDamage;
+        int damageToDeal;
         if (activeMonster.currentMana >= activeMonster.maxMana && activeMonster.maxMana > 0) {
             activeMonster.currentMana -= activeMonster.maxMana;
             int baseDamage = (int)(15 * (activeMonster.getMaxHp() / 50.0));
-            finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
-            int actualDamage = Math.max(1, finalDamage - (playerVit / 2));
+            damageToDeal = (int)(baseDamage * (isCrit ? critMult : 1.0));
+            int actualDamage = Math.max(1, damageToDeal - tVit); // 1 VIT = 1 Defense
             log((isCrit ? "CRITICAL! " : "") + getString(R.string.battle_log_monster_special, activeMonster.name, "SPECIAL", actualDamage));
             playerCurrentHp -= actualDamage;
         } else {
             int baseDamage = activeMonster.getTotalStr();
-            finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
-            int actualDamage = Math.max(1, finalDamage - (playerVit / 2));
+            damageToDeal = (int)(baseDamage * (isCrit ? critMult : 1.0));
+            int actualDamage = Math.max(1, damageToDeal - tVit); // 1 VIT = 1 Defense
             log((isCrit ? "CRITICAL! " : "") + getString(R.string.battle_log_monster_attack, activeMonster.name, actualDamage));
             playerCurrentHp -= actualDamage;
         }
         
-        int playerManaRegen = 2 + (playerMgc / 5);
+        // Mana regen scales with MGC
+        int playerManaRegen = 2 + (tMgc / 5);
         playerCurrentMana = Math.min(playerMaxMana, playerCurrentMana + playerManaRegen);
         activeMonster.currentMana = Math.min(activeMonster.maxMana, activeMonster.currentMana + activeMonster.manaRegen);
         

@@ -33,6 +33,10 @@ public class ItemDB {
         // Armor
         addItem(new Item(201, "Iron Plate", placeholder, SlotType.ARMOR, 0, 8, 0, -2, 100, 1));
         addItem(new Item(202, "Steel Plate", placeholder, SlotType.ARMOR, 0, 15, 0, -4, 300, 2));
+
+        // Boots
+        addItem(new Item(301, "Leather Boots", placeholder, SlotType.BOOTS, 0, 2, 0, 5, 50, 1));
+        addItem(new Item(302, "Running Shoes", placeholder, SlotType.BOOTS, 0, 0, 0, 30, 200, 1));
     }
 
     public static java.util.Collection<Item> getAllItems() {

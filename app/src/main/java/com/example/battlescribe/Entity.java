@@ -11,7 +11,7 @@ public abstract class Entity {
     protected int baseMgc;
     protected int baseAgi;
 
-    // CTB System (Charge Time Battle)
+    // CTB System
     protected int currentCharge = 0;
 
     public Entity(String name, int maxHp, int baseStr, int baseVit, int baseMgc, int baseAgi) {
@@ -30,17 +30,30 @@ public abstract class Entity {
     public int getTotalMgc() { return baseMgc; }
     public int getTotalAgi() { return baseAgi; }
 
-    // Speed: Base 10 + 1 per AGI point
+    // Speed for CTB: Base 10
+    // Players: 1 AGI = 1 Speed
+    // Monsters: 2 AGI = 1 Speed (Nerfed)
     public int getSpeed() {
+        if (this instanceof Monster) {
+            return 10 + (getTotalAgi() / 2);
+        }
         return 10 + getTotalAgi();
     }
 
-    // Crit Chance: 0.5% per AGI point (e.g., 20 AGI = 10% chance = 0.10)
+    // Defense: Only players get defense from VIT (1 VIT = 1 Defense)
+    public int getDefense() {
+        if (this instanceof Monster) {
+            return 0;
+        }
+        return getTotalVit();
+    }
+
+    // Crit Chance: 0.5% per AGI point
     public double getCritChance() {
         return getTotalAgi() * 0.005;
     }
 
-    // Crit Multiplier: 1.5x base + 1% per STR point (e.g., 50 STR = 2.0x crit)
+    // Crit Multiplier: 1.5x base + 1% per STR point
     public double getCritMultiplier() {
         return 1.5 + (getTotalStr() * 0.01);
     }
@@ -53,8 +66,9 @@ public abstract class Entity {
     public boolean isAlive() { return currentHp > 0; }
 
     public void takeDamage(int amount) {
-        int realDamage = Math.max(1, amount); 
-        this.currentHp -= realDamage;
+        // Damage is reduced by defense
+        int damageAfterDefense = Math.max(1, amount - getDefense());
+        this.currentHp -= damageAfterDefense;
         if (this.currentHp < 0) this.currentHp = 0;
     }
 

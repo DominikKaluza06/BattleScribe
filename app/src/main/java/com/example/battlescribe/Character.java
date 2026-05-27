@@ -217,13 +217,10 @@ public class Character extends AppCompatActivity {
         StringBuilder desc = new StringBuilder();
         desc.append("Slot: ").append(item.slot.name()).append("\n");
         
-        appendStat(desc, "STR", item.strBonus);
-        desc.append(" | ");
-        appendStat(desc, "VIT", item.vitBonus);
-        desc.append("\n");
-        appendStat(desc, "MGC", item.mgcBonus);
-        desc.append(" | ");
-        appendStat(desc, "AGI", item.agiBonus);
+        desc.append(formatStat(getString(R.string.label_str), item.strBonus)).append(" | ");
+        desc.append(formatStat(getString(R.string.label_vit), item.vitBonus)).append("\n");
+        desc.append(formatStat(getString(R.string.label_mgc), item.mgcBonus)).append(" | ");
+        desc.append(formatStat(getString(R.string.label_agi), item.agiBonus));
         
         selectedItemDesc.setText(desc.toString());
 
@@ -238,10 +235,10 @@ public class Character extends AppCompatActivity {
         actionButton.setAlpha(1.0f);
     }
 
-    private void appendStat(StringBuilder sb, String label, int value) {
-        sb.append(label).append(": ");
-        if (value >= 0) sb.append("+");
-        sb.append(value);
+    private String formatStat(String label, int value) {
+        if (value > 0) return getString(R.string.stat_format_plus, label, value);
+        if (value < 0) return getString(R.string.stat_format_minus, label, value);
+        return getString(R.string.stat_format_zero, label);
     }
 
     private void hideItemInfo() {

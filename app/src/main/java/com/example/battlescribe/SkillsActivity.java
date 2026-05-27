@@ -51,6 +51,14 @@ public class SkillsActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         displaySkills();
@@ -95,11 +103,9 @@ public class SkillsActivity extends AppCompatActivity {
             btnAction.setOnClickListener(v -> {
                 boolean currentlyEquipped = skillPrefs.getBoolean("equipped_" + skill.id, false);
                 if (currentlyEquipped) {
-                    // Unequip logic
                     skillPrefs.edit().putBoolean("equipped_" + skill.id, false).apply();
                     updateButtonState(btnAction, false);
                 } else {
-                    // Equip logic
                     if (getEquippedCount(skillPrefs) < MAX_EQUIPPED_SKILLS) {
                         skillPrefs.edit().putBoolean("equipped_" + skill.id, true).apply();
                         updateButtonState(btnAction, true);
@@ -147,6 +153,11 @@ public class SkillsActivity extends AppCompatActivity {
         });
         findViewById(R.id.adventure).setOnClickListener(v -> {
             Intent intent = new Intent(this, BattleChoiceActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
+        findViewById(R.id.crafting).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CraftingActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });

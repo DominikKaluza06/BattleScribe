@@ -7,6 +7,11 @@
     android:background="@drawable/inv_background"
     tools:context=".BattleActivity">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#AA000000" />
+
     <!-- Monster Section (Top) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/monster_section"

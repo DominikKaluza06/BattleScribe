@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BattleScribe">
         <activity
+            android:name=".CraftingActivity"
+            android:exported="false" />
+        <activity
             android:name=".StoryActivity"
             android:exported="false" />
         <activity

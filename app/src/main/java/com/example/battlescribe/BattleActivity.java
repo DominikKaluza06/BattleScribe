@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class BattleActivity extends AppCompatActivity {
 
@@ -25,6 +26,7 @@ public class BattleActivity extends AppCompatActivity {
     private int playerMaxHp, playerCurrentHp, playerMaxMana, playerCurrentMana;
     private int playerStr, playerVit, playerMgc, playerAgi;
     private int playerGold, playerExp, playerLevel, playerStatPoints;
+    private int playerCharge = 0; // CTB Charge
     private Item equippedWeapon;
     private List<Skill> equippedSkills = new ArrayList<>();
     private Map<Integer, Integer> currentCooldowns = new HashMap<>();
@@ -38,41 +40,54 @@ public class BattleActivity extends AppCompatActivity {
     private TextView[] skillCdTexts = new TextView[4];
 
     private TextView battleLog;
-    private boolean isPlayerTurn = true; 
+    private boolean isPlayerTurn = false; 
     private Handler battleHandler = new Handler();
-    private int wave = 1;
-    private boolean isInfinite = false;
+    private boolean isAdventureMode = false;
     private boolean isStoryMode = false;
+    private Random rnd = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
 
-        wave = getIntent().getIntExtra("WAVE", 1);
-        isInfinite = getIntent().getBooleanExtra("IS_INFINITE", false);
+        isAdventureMode = getIntent().getBooleanExtra("IS_ADVENTURE", false);
         isStoryMode = getIntent().getBooleanExtra("STORY_MODE", false);
+        String monsterType = getIntent().getStringExtra("MONSTER_TYPE");
 
         initUI();
         loadPlayerData();
         ItemDB.init(this);
         SkillDB.init(this);
+        MaterialDB.init(this);
         loadEquippedSkills();
         
-        SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
-        int chapter = storyPrefs.getInt("chapter", 1);
+        int monsterLevel = playerLevel;
+        double difficultyMult = 1.0;
         
-        double difficultyMult = (1 + chapter * 0.3) * Math.pow(wave, 0.5);
-        
-        if (chapter >= 2) {
-            activeMonster = new Skeleton(this, wave, difficultyMult);
+        if (isStoryMode) {
+            activeMonster = new Goblin(this, 1, 1.0);
+        } else if (isAdventureMode) {
+            if (monsterType != null) {
+                if (monsterType.equals("SKELETON")) {
+                    activeMonster = new Skeleton(this, monsterLevel, difficultyMult);
+                } else if (monsterType.equals("ZOMBIE")) {
+                    activeMonster = new Zombie(this, monsterLevel, difficultyMult);
+                } else {
+                    activeMonster = new Goblin(this, monsterLevel, difficultyMult);
+                }
+            } else {
+                activeMonster = new Zombie(this, monsterLevel, difficultyMult);
+            }
         } else {
-            activeMonster = new Goblin(this, wave, difficultyMult);
+            activeMonster = new Goblin(this, 1, 1.0);
         }
         
         setupBattleUI();
-        log(getString(R.string.battle_log_start_wave, wave, activeMonster.name));
-        log(getString(R.string.battle_log_your_turn));
+        log(getString(R.string.battle_log_start, activeMonster.name));
+        
+        // Start the CTB loop
+        battleHandler.postDelayed(this::processCTB, 1000);
     }
 
     private void initUI() {
@@ -156,6 +171,7 @@ public class BattleActivity extends AppCompatActivity {
         monsterName.setText(activeMonster.name);
         monsterIcon.setImageBitmap(activeMonster.icon);
         monsterHpBar.setMax(activeMonster.getMaxHp());
+        monsterHpBar.setProgress(activeMonster.currentHp);
         monsterManaBar.setMax(activeMonster.maxMana > 0 ? activeMonster.maxMana : 100);
 
         playerName.setText(getString(R.string.hero_lv_format, playerLevel));
@@ -169,18 +185,48 @@ public class BattleActivity extends AppCompatActivity {
         battleLog.append("\n" + message);
     }
 
+    private void processCTB() {
+        if (activeMonster.isDead() || playerCurrentHp <= 0) return;
+
+        int pSpeed = 10 + (playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0));
+        int mSpeed = activeMonster.getSpeed();
+
+        while (playerCharge < 100 && activeMonster.getCurrentCharge() < 100) {
+            playerCharge += pSpeed;
+            activeMonster.addCharge(mSpeed);
+        }
+
+        if (playerCharge >= 100) {
+            playerCharge -= 100;
+            isPlayerTurn = true;
+            log(getString(R.string.battle_log_your_turn));
+        } else {
+            activeMonster.addCharge(-100); // Reduce by 100 instead of resetting
+            monsterTurn();
+        }
+    }
+
     private void handlePlayerAction(Skill skill) {
         if (!isPlayerTurn || activeMonster.isDead() || playerCurrentHp <= 0) return;
 
-        int totalStr = playerStr + (equippedWeapon != null ? equippedWeapon.strBonus : 0);
-        int totalVit = playerVit + (equippedWeapon != null ? equippedWeapon.vitBonus : 0);
-        int totalMgc = playerMgc + (equippedWeapon != null ? equippedWeapon.mgcBonus : 0);
-        int totalAgi = playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0);
+        int tStr = playerStr + (equippedWeapon != null ? equippedWeapon.strBonus : 0);
+        int tVit = playerVit + (equippedWeapon != null ? equippedWeapon.vitBonus : 0);
+        int tMgc = playerMgc + (equippedWeapon != null ? equippedWeapon.mgcBonus : 0);
+        int tAgi = playerAgi + (equippedWeapon != null ? equippedWeapon.agiBonus : 0);
+
+        // Crit logic
+        double critChance = tAgi * 0.005;
+        double critMult = 1.5 + (tStr * 0.01);
+        boolean isCrit = rnd.nextDouble() < critChance;
 
         if (skill == null) {
-            int actualDamage = totalStr; 
-            activeMonster.takeDamage(totalStr);
-            log(getString(R.string.battle_log_player_attack, activeMonster.name, actualDamage));
+            int baseDamage = tStr;
+            int finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
+            int actualDamage = Math.max(1, finalDamage - activeMonster.getTotalVit()); 
+            activeMonster.takeDamage(finalDamage);
+            String msg = getString(R.string.battle_log_player_attack, activeMonster.name, actualDamage);
+            if (isCrit) msg = "CRITICAL! " + msg;
+            log(msg);
         } else {
             if (currentCooldowns.get(skill.id) > 0) {
                 Toast.makeText(this, getString(R.string.toast_skill_on_cooldown), Toast.LENGTH_SHORT).show();
@@ -193,14 +239,17 @@ public class BattleActivity extends AppCompatActivity {
             playerCurrentMana -= skill.manaCost;
             currentCooldowns.put(skill.id, skill.cooldown);
             
-            int skillValue = skill.calculateValue(totalStr, totalVit, totalMgc, totalAgi, playerMaxHp);
+            int skillValue = skill.calculateValue(tStr, tVit, tMgc, tAgi, playerMaxHp);
             if (skill.name.toLowerCase().contains("heal")) {
                 playerCurrentHp = Math.min(playerMaxHp, playerCurrentHp + skillValue);
                 log(getString(R.string.battle_log_player_heal, skillValue));
             } else {
-                int actualDamage = skillValue;
-                activeMonster.takeDamage(skillValue);
-                log(getString(R.string.battle_log_player_skill, skill.name, actualDamage));
+                int finalDamage = (int)(skillValue * (isCrit ? critMult : 1.0));
+                int actualDamage = Math.max(1, finalDamage - activeMonster.getTotalVit());
+                activeMonster.takeDamage(finalDamage);
+                String msg = getString(R.string.battle_log_player_skill, skill.name, actualDamage);
+                if (isCrit) msg = "CRITICAL! " + msg;
+                log(msg);
             }
         }
 
@@ -209,28 +258,35 @@ public class BattleActivity extends AppCompatActivity {
         if (activeMonster.isDead()) checkVictory();
         else {
             isPlayerTurn = false;
-            battleHandler.postDelayed(this::monsterTurn, 1000);
+            battleHandler.postDelayed(this::processCTB, 1000);
         }
     }
 
     private void monsterTurn() {
         if (activeMonster.isDead() || playerCurrentHp <= 0) return;
 
+        // Monster Crit logic
+        boolean isCrit = rnd.nextDouble() < activeMonster.getCritChance();
+        double critMult = activeMonster.getCritMultiplier();
+
         int finalDamage;
         if (activeMonster.currentMana >= activeMonster.maxMana && activeMonster.maxMana > 0) {
             activeMonster.currentMana -= activeMonster.maxMana;
-            finalDamage = Math.max(1, (int)(15 * (activeMonster.getMaxHp() / 50.0)) - (playerVit / 2)); 
-            log(getString(R.string.battle_log_monster_special, activeMonster.name, "SPECIAL", finalDamage));
+            int baseDamage = (int)(15 * (activeMonster.getMaxHp() / 50.0));
+            finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
+            int actualDamage = Math.max(1, finalDamage - (playerVit / 2));
+            log((isCrit ? "CRITICAL! " : "") + getString(R.string.battle_log_monster_special, activeMonster.name, "SPECIAL", actualDamage));
+            playerCurrentHp -= actualDamage;
         } else {
-            finalDamage = Math.max(1, activeMonster.getTotalStr() - (playerVit / 2));
-            log(getString(R.string.battle_log_monster_attack, activeMonster.name, finalDamage));
+            int baseDamage = activeMonster.getTotalStr();
+            finalDamage = (int)(baseDamage * (isCrit ? critMult : 1.0));
+            int actualDamage = Math.max(1, finalDamage - (playerVit / 2));
+            log((isCrit ? "CRITICAL! " : "") + getString(R.string.battle_log_monster_attack, activeMonster.name, actualDamage));
+            playerCurrentHp -= actualDamage;
         }
-        
-        playerCurrentHp -= finalDamage;
         
         int playerManaRegen = 2 + (playerMgc / 5);
         playerCurrentMana = Math.min(playerMaxMana, playerCurrentMana + playerManaRegen);
-        
         activeMonster.currentMana = Math.min(activeMonster.maxMana, activeMonster.currentMana + activeMonster.manaRegen);
         
         for (Integer skillId : currentCooldowns.keySet()) {
@@ -242,8 +298,7 @@ public class BattleActivity extends AppCompatActivity {
         updateSkillIcons();
         if (playerCurrentHp <= 0) checkDefeat();
         else {
-            isPlayerTurn = true;
-            log(getString(R.string.battle_log_your_turn));
+            battleHandler.postDelayed(this::processCTB, 1000);
         }
     }
 
@@ -281,16 +336,27 @@ public class BattleActivity extends AppCompatActivity {
         playerExp += activeMonster.expReward;
         log(getString(R.string.battle_log_rewards, activeMonster.goldReward, activeMonster.expReward));
         
+        // Material drops logic
+        SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
+        SharedPreferences.Editor matEditor = matPrefs.edit();
+        for (Map.Entry<Integer, Double> drop : activeMonster.materialDrops.entrySet()) {
+            if (rnd.nextDouble() < drop.getValue()) {
+                int matId = drop.getKey();
+                Material mat = MaterialDB.getMaterial(matId);
+                if (mat != null) {
+                    int count = matPrefs.getInt("mat_" + matId, 0);
+                    matEditor.putInt("mat_" + matId, count + 1);
+                    log("Dropped: " + mat.name + "!");
+                }
+            }
+        }
+        matEditor.apply();
+
         if (isStoryMode && activeMonster instanceof Goblin) {
             SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
             if (storyPrefs.getInt("chapter", 1) == 1) {
                 storyPrefs.edit().putInt("chapter", 2).putInt("step", 0).apply();
                 log("STORY CHAPTER 2 UNLOCKED!");
-                
-                // Reset Infinite Wave progress because Skeletons are OP
-                getSharedPreferences("BattleProgress", MODE_PRIVATE).edit()
-                        .putInt("infinite_wave", 1).apply();
-                log("Infinite waves reset for new chapter!");
             }
         }
 
@@ -304,10 +370,6 @@ public class BattleActivity extends AppCompatActivity {
         }
 
         savePlayerData();
-        if (isInfinite) {
-            SharedPreferences p = getSharedPreferences("BattleProgress", MODE_PRIVATE);
-            if (wave == p.getInt("infinite_wave", 1)) p.edit().putInt("infinite_wave", wave + 1).apply();
-        }
         Toast.makeText(this, "Victory!", Toast.LENGTH_SHORT).show();
         battleHandler.postDelayed(this::finish, 2000);
     }

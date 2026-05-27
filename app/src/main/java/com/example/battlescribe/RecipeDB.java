@@ -37,4 +37,7 @@ public class RecipeDB {
     public static List<Recipe> getAllRecipes() {
         return allRecipes;
     }
+
+    public static void init(CraftingActivity craftingActivity) {
+    }
 }

@@ -101,19 +101,25 @@ public class ShopActivity extends AppCompatActivity {
 
     private void setupNavigation() {
         findViewById(R.id.character).setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, Character.class);
+            Intent intent = new Intent(this, Character.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
         
         findViewById(R.id.skills).setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, SkillsActivity.class);
+            Intent intent = new Intent(this, SkillsActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
 
         findViewById(R.id.adventure).setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, BattleChoiceActivity.class);
+            Intent intent = new Intent(this, BattleChoiceActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
+
+        findViewById(R.id.crafting).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CraftingActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
@@ -143,10 +149,8 @@ public class ShopActivity extends AppCompatActivity {
 
     private void loadShopItems() {
         for (int i = 0; i < 24; i++) shopItems[i] = null;
-        
         SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
         int currentChapter = storyPrefs.getInt("chapter", 1);
-        
         int index = 0;
         for (Item item : ItemDB.getAllItems()) {
             if (item.requiredChapter <= currentChapter) {
@@ -190,15 +194,9 @@ public class ShopActivity extends AppCompatActivity {
             ImageView slot = findViewById(shopSlotIds[i]);
             int itemIndex = startOffset + i;
             final Item item = (itemIndex < shopItems.length) ? shopItems[itemIndex] : null;
-
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
-                slot.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showItemDescription(item, false);
-                    }
-                });
+                slot.setOnClickListener(v -> showItemDescription(item, false));
             } else {
                 slot.setImageBitmap(null);
                 slot.setOnClickListener(null);
@@ -214,16 +212,10 @@ public class ShopActivity extends AppCompatActivity {
             ImageView slot = findViewById(sellSlotIds[i]);
             int itemIndex = startOffset + i;
             final Item item = (itemIndex < inventoryItems.length) ? inventoryItems[itemIndex] : null;
-
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
                 slot.setAlpha(1.0f);
-                slot.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showItemDescription(item, true);
-                    }
-                });
+                slot.setOnClickListener(v -> showItemDescription(item, true));
             } else {
                 slot.setImageBitmap(null);
                 slot.setOnClickListener(null);
@@ -234,16 +226,13 @@ public class ShopActivity extends AppCompatActivity {
     private void showItemDescription(Item item, boolean isSellMode) {
         selectedItem = item;
         this.isSelling = isSellMode;
-        
         itemInfoPanel.setVisibility(View.VISIBLE);
         selectedItemIcon.setImageBitmap(item.iconBitmap);
         selectedItemName.setText(item.name);
-        
         String desc = "Price: " + (isSellMode ? item.price / 2 : item.price) + " Gold\n" +
                      "STR: +" + item.strBonus + " | " + "VIT: +" + item.vitBonus + "\n" +
                      "MGC: +" + item.mgcBonus + " | " + "AGI: +" + item.agiBonus;
         selectedItemDesc.setText(desc);
-        
         if (isSellMode) {
             actionButton.setText(getString(R.string.btn_sell) + " (" + (item.price / 2) + ")");
             actionButton.setEnabled(true);
@@ -264,11 +253,9 @@ public class ShopActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.toast_already_owned), Toast.LENGTH_SHORT).show();
             return;
         }
-        
         playerGold -= selectedItem.price;
         saveGold();
         itemPrefs.edit().putBoolean("owned_" + selectedItem.id, true).commit();
-        
         Toast.makeText(this, getString(R.string.toast_bought, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
@@ -278,13 +265,10 @@ public class ShopActivity extends AppCompatActivity {
 
     public void sellItem() {
         if (selectedItem == null) return;
-        
         playerGold += selectedItem.price / 2;
         saveGold();
-        
         SharedPreferences prefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         prefs.edit().remove("owned_" + selectedItem.id).commit();
-        
         Toast.makeText(this, getString(R.string.toast_sold, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();

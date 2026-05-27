@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.widget.Button;
@@ -45,6 +44,7 @@ public class CraftingActivity extends AppCompatActivity {
 
         ItemDB.init(this);
         MaterialDB.init(this);
+        RecipeDB.init(this);
 
         setupRecipes();
         setupNavigation();
@@ -60,7 +60,6 @@ public class CraftingActivity extends AppCompatActivity {
                 controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         } else {
-            // Older versions
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -111,7 +110,6 @@ public class CraftingActivity extends AppCompatActivity {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             int required = entry.getValue();
             
-            // Create a vertical layout for each material (Icon + Text)
             LinearLayout matLayout = new LinearLayout(this);
             matLayout.setOrientation(LinearLayout.VERTICAL);
             matLayout.setGravity(Gravity.CENTER);
@@ -124,7 +122,7 @@ public class CraftingActivity extends AppCompatActivity {
             
             TextView tv = new TextView(this);
             tv.setText(owned + "/" + required);
-            tv.setTextColor(owned >= required ? Color.GREEN : Color.RED);
+            tv.setTextColor(owned >= required ? Color.WHITE : Color.RED); // Changed to white/red
             tv.setGravity(Gravity.CENTER);
 
             matLayout.addView(iv);
@@ -144,7 +142,6 @@ public class CraftingActivity extends AppCompatActivity {
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
         SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         
-        // Double check requirements
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             if (owned < entry.getValue()) {
@@ -153,7 +150,6 @@ public class CraftingActivity extends AppCompatActivity {
             }
         }
 
-        // Consume materials
         SharedPreferences.Editor editor = matPrefs.edit();
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
@@ -161,11 +157,10 @@ public class CraftingActivity extends AppCompatActivity {
         }
         editor.apply();
 
-        // Add item to inventory
         itemPrefs.edit().putBoolean("owned_" + selectedRecipe.resultItemId, true).apply();
         
         Toast.makeText(this, "Crafted " + ItemDB.getItem(selectedRecipe.resultItemId).name + "!", Toast.LENGTH_SHORT).show();
-        showRecipe(selectedRecipe); // Refresh UI
+        showRecipe(selectedRecipe);
     }
 
     private void setupNavigation() {

@@ -168,14 +168,17 @@ public class Character extends AppCompatActivity {
             startActivity(intent);
         });
 
-        View adventureBtn = findViewById(R.id.adventure);
-        if (adventureBtn != null) {
-            adventureBtn.setOnClickListener(v -> {
-                Intent intent = new Intent(Character.this, BattleChoiceActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-            });
-        }
+        findViewById(R.id.adventure).setOnClickListener(v -> {
+            Intent intent = new Intent(Character.this, BattleChoiceActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
+
+        findViewById(R.id.crafting).setOnClickListener(v -> {
+            Intent intent = new Intent(Character.this, CraftingActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -211,10 +214,18 @@ public class Character extends AppCompatActivity {
         selectedItemIcon.setImageBitmap(item.iconBitmap);
         selectedItemName.setText(item.name);
         
-        String desc = "Slot: " + item.slot.name() + "\n" +
-                     "STR: +" + item.strBonus + " | " + "VIT: +" + item.vitBonus + "\n" +
-                     "MGC: +" + item.mgcBonus + " | " + "AGI: +" + item.agiBonus;
-        selectedItemDesc.setText(desc);
+        StringBuilder desc = new StringBuilder();
+        desc.append("Slot: ").append(item.slot.name()).append("\n");
+        
+        appendStat(desc, "STR", item.strBonus);
+        desc.append(" | ");
+        appendStat(desc, "VIT", item.vitBonus);
+        desc.append("\n");
+        appendStat(desc, "MGC", item.mgcBonus);
+        desc.append(" | ");
+        appendStat(desc, "AGI", item.agiBonus);
+        
+        selectedItemDesc.setText(desc.toString());
 
         if (fromEquipSlot) {
             actionButton.setText(R.string.btn_unequip);
@@ -225,6 +236,12 @@ public class Character extends AppCompatActivity {
         }
         actionButton.setEnabled(true);
         actionButton.setAlpha(1.0f);
+    }
+
+    private void appendStat(StringBuilder sb, String label, int value) {
+        sb.append(label).append(": ");
+        if (value >= 0) sb.append("+");
+        sb.append(value);
     }
 
     private void hideItemInfo() {
@@ -254,6 +271,7 @@ public class Character extends AppCompatActivity {
                     }
                 }
             } else {
+                equippedItems.remove(type);
                 if (slotView != null) {
                     slotView.setImageBitmap(null);
                     slotView.setOnClickListener(null);

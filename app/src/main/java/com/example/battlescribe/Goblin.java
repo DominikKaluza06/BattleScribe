@@ -4,20 +4,20 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 
 public class Goblin extends Monster {
-    public Goblin(Context context, int wave, double difficultyMult) {
-        // Base stats for Goblin: 30 HP, 10 STR
+    public Goblin(Context context, int level, double difficultyMult) {
+        // Base stats for Goblin (Lv 1): 30 HP, 10 STR, 1 VIT, 0 MGC, 5 AGI
         super(
-            "Goblin (Lv " + wave + ")", 
-            (int)(30 * difficultyMult), // hp scaled
+            "Goblin (Lv " + level + ")", 
+            30 + (level - 1) * 20,       // hp scaled
             20,                          // mana
             3,                           // mana regen
-            (int)(10 * difficultyMult), // str scaled
-            (int)(1 * difficultyMult),  // vit (scaling vit for HP/Defense mix)
-            0,                           // mgc
-            5,                           // agi
+            10 + (level - 1) * 2,        // str scaled
+            1 + (level - 1) * 2,         // vit scaled
+            (level - 1) * 2,             // mgc scaled
+            5 + (level - 1) * 2,         // agi scaled
             BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_dialog_map),
-            10 * wave,                   // gold reward
-            20 * wave                    // exp reward
+            (10 * level) / 4,            // gold reward reduced 4x
+            (20 * level) / 2             // exp reward reduced 2x
         );
         this.currentMana = 0;
         

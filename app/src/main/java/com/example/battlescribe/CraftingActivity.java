@@ -56,7 +56,7 @@ public class CraftingActivity extends AppCompatActivity {
         setupRecipes();
         setupNavigation();
 
-        // Standard OnClickListener replacing lambda expression
+        // Standard OnClickListener
         btnCraft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

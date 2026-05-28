@@ -37,7 +37,7 @@ public class StoryActivity extends AppCompatActivity {
         currentChapter = prefs.getInt("chapter", 1);
         storyStep = prefs.getInt("step", 0);
 
-        // Standard OnClickListener replacing lambda
+        // Standard OnClickListener
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

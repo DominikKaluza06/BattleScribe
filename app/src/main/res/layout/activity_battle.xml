@@ -7,18 +7,13 @@
     android:background="@drawable/inv_background"
     tools:context=".BattleActivity">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#AA000000" />
-
     <!-- Monster Section (Top) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/monster_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#AA000000"
+        android:background="@drawable/medium_background"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -26,6 +21,8 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:scaleType="fitCenter"
+            android:background="#22000000"
+            android:padding="4dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@android:drawable/ic_menu_report_image" />
@@ -39,6 +36,10 @@
             android:textColor="#FFFFFF"
             android:textSize="22sp"
             android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
             app:layout_constraintStart_toEndOf="@+id/monster_icon"
             app:layout_constraintTop_toTopOf="@+id/monster_icon" />
 
@@ -99,8 +100,9 @@
         android:id="@+id/battle_log_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="8dp"
-        android:background="#CC000000"
+        android:layout_margin="12dp"
+        android:background="@drawable/light_background"
+        android:elevation="4dp"
         app:layout_constraintBottom_toTopOf="@+id/player_section"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,10 +112,11 @@
             android:id="@+id/battle_log_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="12dp"
             android:text=""
-            android:textColor="#FFFFFF"
+            android:textColor="#3E2723"
             android:textSize="14sp"
+            android:textStyle="bold"
             android:fontFamily="monospace" />
     </ScrollView>
 
@@ -123,7 +126,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#AA000000"
+        android:background="@drawable/medium_background"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
@@ -131,6 +134,8 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@mipmap/ic_launcher"
+            android:background="#22000000"
+            android:padding="2dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -142,6 +147,11 @@
             android:text="@string/hero_name"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
+            android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
             app:layout_constraintStart_toEndOf="@+id/player_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -208,12 +218,13 @@
             <!-- Basic Attack -->
             <ImageView
                 android:id="@+id/btn_basic_attack"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
-                android:background="#44FFFFFF"
-                android:padding="4dp"
-                android:scaleType="fitCenter" />
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/light_background"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:elevation="4dp" />
 
             <!-- Dynamic Skill Slots -->
             <FrameLayout
@@ -223,11 +234,12 @@
                 android:visibility="gone">
                 <ImageView
                     android:id="@+id/skill_slot1"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="4dp"
-                    android:background="#44FFFFFF"
-                    android:padding="4dp" />
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/light_background"
+                    android:padding="6dp"
+                    android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd1"
                     android:layout_width="wrap_content"
@@ -236,6 +248,8 @@
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="3"
                     android:text="2"
                     android:visibility="gone" />
             </FrameLayout>
@@ -247,11 +261,12 @@
                 android:visibility="gone">
                 <ImageView
                     android:id="@+id/skill_slot2"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="4dp"
-                    android:background="#44FFFFFF"
-                    android:padding="4dp" />
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/light_background"
+                    android:padding="6dp"
+                    android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd2"
                     android:layout_width="wrap_content"
@@ -260,6 +275,8 @@
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="3"
                     android:text="2"
                     android:visibility="gone" />
             </FrameLayout>
@@ -271,11 +288,12 @@
                 android:visibility="gone">
                 <ImageView
                     android:id="@+id/skill_slot3"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="4dp"
-                    android:background="#44FFFFFF"
-                    android:padding="4dp" />
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/light_background"
+                    android:padding="6dp"
+                    android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd3"
                     android:layout_width="wrap_content"
@@ -284,6 +302,8 @@
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="3"
                     android:text="2"
                     android:visibility="gone" />
             </FrameLayout>
@@ -295,11 +315,12 @@
                 android:visibility="gone">
                 <ImageView
                     android:id="@+id/skill_slot4"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="4dp"
-                    android:background="#44FFFFFF"
-                    android:padding="4dp" />
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/light_background"
+                    android:padding="6dp"
+                    android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd4"
                     android:layout_width="wrap_content"
@@ -308,6 +329,8 @@
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="3"
                     android:text="2"
                     android:visibility="gone" />
             </FrameLayout>

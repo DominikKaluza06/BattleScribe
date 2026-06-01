@@ -5,13 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/inv_background"
     tools:context=".SkillsActivity">
 
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="0dp"
         android:layout_height="100dp"
-        android:background="#333333"
+        android:background="@drawable/medium_background"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,6 +26,8 @@
         android:textColor="#FFFFFF"
         android:textSize="40sp"
         android:textStyle="bold"
+        android:shadowColor="#000000"
+        android:shadowRadius="4"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +36,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#1A1A1A"
+        android:background="#66000000"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,45 +63,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
-            android:id="@+id/shop"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_compass" />
-
-        <ImageView
-            android:id="@+id/skills"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="12dp"
-            android:background="#44FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_manage" />
-
-        <ImageView
-            android:id="@+id/adventure"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_mapmode" />
-
-        <ImageView
-            android:id="@+id/crafting"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_edit" />
-
-        <ImageView
-            android:id="@+id/character"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="12dp"
-            app:srcCompat="@android:drawable/ic_menu_myplaces" />
+        <ImageView android:id="@+id/shop" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_compass" />
+        <ImageView android:id="@+id/skills" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" android:background="#44FFFFFF" app:srcCompat="@android:drawable/ic_menu_manage" />
+        <ImageView android:id="@+id/adventure" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_mapmode" />
+        <ImageView android:id="@+id/crafting" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_edit" />
+        <ImageView android:id="@+id/character" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_myplaces" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

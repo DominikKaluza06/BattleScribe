@@ -16,27 +16,24 @@ import java.util.Set;
 
 /**
  * Activity for the in-game Shop.
- * Players can purchase equipment based on story progress and sell items they own.
+ * Handles buying new gear and selling unequipped items.
  */
 public class ShopActivity extends AppCompatActivity {
 
-    // Arrays to store items for the current page
     private Item[] shopItems = new Item[24];
     private Item[] inventoryItems = new Item[24];
     private int currentPage = 0;
     private Item selectedItem = null;
-    private boolean isSelling = false; // Toggle to distinguish between buying and selling logic
+    private boolean isSelling = false; 
     private int playerGold = 0;
     
     private TextView tvGold;
 
-    // View IDs for the 8 slots in the shop display grid
     private final int[] shopSlotIds = {
             R.id.shop_slot1, R.id.shop_slot2, R.id.shop_slot3, R.id.shop_slot4,
             R.id.shop_slot5, R.id.shop_slot6, R.id.shop_slot7, R.id.shop_slot8
     };
 
-    // View IDs for the 8 slots in the selling (inventory) display grid
     private final int[] sellSlotIds = {
             R.id.sell_slot1, R.id.sell_slot2, R.id.sell_slot3, R.id.sell_slot4,
             R.id.sell_slot5, R.id.sell_slot6, R.id.sell_slot7, R.id.sell_slot8
@@ -54,15 +51,14 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         hideSystemUI();
 
-        // Initialize UI components
+        // UI Binding - Fixed IDs to match activity_shop.xml
         tvGold = findViewById(R.id.tv_gold);
         itemInfoPanel = findViewById(R.id.item_info_panel);
-        selectedItemIcon = findViewById(R.id.selected_char_item_icon);
-        selectedItemName = findViewById(R.id.selected_char_item_name);
-        selectedItemDesc = findViewById(R.id.selected_char_item_desc);
+        selectedItemIcon = findViewById(R.id.selected_item_icon);
+        selectedItemName = findViewById(R.id.selected_item_name);
+        selectedItemDesc = findViewById(R.id.selected_item_desc);
         actionButton = findViewById(R.id.action_button);
 
-        // Standard OnClickListener for the Buy/Sell button
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,16 +72,12 @@ public class ShopActivity extends AppCompatActivity {
 
         setupNavigation();
 
-        // Initialize database and load initial state
         ItemDB.init(this);
         loadPlayerData();
         loadShopItems();
         loadInventory();
     }
 
-    /**
-     * Hides the Android system bars for an immersive fullscreen experience.
-     */
     private void hideSystemUI() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             final WindowInsetsController controller = getWindow().getInsetsController();
@@ -112,9 +104,6 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Connects bottom navigation icons to their respective activities.
-     */
     private void setupNavigation() {
         findViewById(R.id.character).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,9 +164,6 @@ public class ShopActivity extends AppCompatActivity {
         selectedItem = null;
     }
 
-    /**
-     * Filters all items from the database and only displays those available to the player's chapter.
-     */
     private void loadShopItems() {
         for (int i = 0; i < 24; i++) shopItems[i] = null;
         SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
@@ -194,9 +180,6 @@ public class ShopActivity extends AppCompatActivity {
         updateShopUI();
     }
 
-    /**
-     * Loads items the player owns into the selling list, excluding currently equipped ones.
-     */
     private void loadInventory() {
         for (int i = 0; i < 24; i++) inventoryItems[i] = null;
         SharedPreferences itemsPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
@@ -222,9 +205,6 @@ public class ShopActivity extends AppCompatActivity {
         updateInventoryUI();
     }
 
-    /**
-     * Updates the shop grid views with item icons and click listeners.
-     */
     private void updateShopUI() {
         int startOffset = currentPage * 8;
         for (int i = 0; i < 8; i++) {
@@ -248,9 +228,6 @@ public class ShopActivity extends AppCompatActivity {
         if (pageText != null) pageText.setText((currentPage + 1) + "/3");
     }
 
-    /**
-     * Updates the inventory sell-grid views with item icons and click listeners.
-     */
     private void updateInventoryUI() {
         int startOffset = currentPage * 8;
         for (int i = 0; i < 8; i++) {
@@ -273,10 +250,6 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Prepares the item details panel for display.
-     * Calculates the correct price for buying (100%) vs selling (50%).
-     */
     private void showItemDescription(final Item item, final boolean isSellMode) {
         selectedItem = item;
         this.isSelling = isSellMode;
@@ -304,18 +277,12 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Formats bonus stats with a '+' sign for positive values.
-     */
     private String formatStat(String label, int value) {
         if (value > 0) return label + ": +" + value;
         if (value < 0) return label + ": " + value;
         return label + ": 0";
     }
 
-    /**
-     * Logic for purchasing an item. Checks gold and marks it as owned.
-     */
     public void buyItem() {
         if (selectedItem == null) return;
         
@@ -341,9 +308,6 @@ public class ShopActivity extends AppCompatActivity {
         selectedItem = null;
     }
 
-    /**
-     * Logic for selling an item. Adds half price gold and removes ownership.
-     */
     public void sellItem() {
         if (selectedItem == null) return;
         
@@ -364,9 +328,6 @@ public class ShopActivity extends AppCompatActivity {
         getSharedPreferences("CharacterStats", MODE_PRIVATE).edit().putInt("gold", playerGold).apply();
     }
 
-    /**
-     * Switches to the next page of the shop/inventory catalog.
-     */
     public void SHOPnextPage(View view) {
         if (currentPage < 2) {
             currentPage++;
@@ -376,9 +337,6 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Switches to the previous page of the shop/inventory catalog.
-     */
     public void SHOPprevPage(View view) {
         if (currentPage > 0) {
             currentPage--;

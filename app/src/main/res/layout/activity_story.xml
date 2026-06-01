@@ -10,7 +10,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000" />
+        android:background="#44000000" />
 
     <TextView
         android:id="@+id/story_title"
@@ -21,6 +21,8 @@
         android:textColor="#FFFFFF"
         android:textSize="32sp"
         android:textStyle="bold"
+        android:shadowColor="#000000"
+        android:shadowRadius="3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,8 +31,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="24dp"
-        app:cardBackgroundColor="#2D2D2D"
         app:cardCornerRadius="12dp"
+        app:cardElevation="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,6 +41,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/medium_background"
             android:padding="24dp">
 
             <TextView
@@ -48,7 +51,10 @@
                 android:text="Loading story..."
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
+                android:textStyle="bold"
                 android:lineSpacingExtra="4dp"
+                android:shadowColor="#000000"
+                android:shadowRadius="2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -59,6 +65,8 @@
                 android:layout_height="100dp"
                 android:layout_marginTop="32dp"
                 android:visibility="gone"
+                android:background="#44000000"
+                android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_story_text" />
@@ -71,8 +79,11 @@
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_margin="24dp"
-        android:backgroundTint="#4CAF50"
+        android:background="@drawable/light_background"
         android:text="NEXT"
+        android:textColor="#3E2723"
+        android:textStyle="bold"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_leave_story"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -87,6 +98,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:text="LEAVE STORY"
         android:textColor="#FF4444"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

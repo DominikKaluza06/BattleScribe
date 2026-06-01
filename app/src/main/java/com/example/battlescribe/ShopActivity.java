@@ -16,13 +16,17 @@ import java.util.Set;
 
 /**
  * Activity for the in-game Shop.
- * Handles buying new gear and selling unequipped items.
+ * Players can purchase equipment and sell items they own.
+ * Paging logic is split between Shop inventory and Player inventory.
  */
 public class ShopActivity extends AppCompatActivity {
 
     private Item[] shopItems = new Item[24];
     private Item[] inventoryItems = new Item[24];
-    private int currentPage = 0;
+    
+    private int shopPage = 0;
+    private int invPage = 0;
+    
     private Item selectedItem = null;
     private boolean isSelling = false; 
     private int playerGold = 0;
@@ -51,7 +55,6 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         hideSystemUI();
 
-        // UI Binding - Fixed IDs to match activity_shop.xml
         tvGold = findViewById(R.id.tv_gold);
         itemInfoPanel = findViewById(R.id.item_info_panel);
         selectedItemIcon = findViewById(R.id.selected_item_icon);
@@ -206,7 +209,7 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void updateShopUI() {
-        int startOffset = currentPage * 8;
+        int startOffset = shopPage * 8;
         for (int i = 0; i < 8; i++) {
             ImageView slot = findViewById(shopSlotIds[i]);
             int itemIndex = startOffset + i;
@@ -225,11 +228,11 @@ public class ShopActivity extends AppCompatActivity {
             }
         }
         TextView pageText = findViewById(R.id.shop_page_text);
-        if (pageText != null) pageText.setText((currentPage + 1) + "/3");
+        if (pageText != null) pageText.setText((shopPage + 1) + "/3");
     }
 
     private void updateInventoryUI() {
-        int startOffset = currentPage * 8;
+        int startOffset = invPage * 8;
         for (int i = 0; i < 8; i++) {
             ImageView slot = findViewById(sellSlotIds[i]);
             int itemIndex = startOffset + i;
@@ -248,6 +251,8 @@ public class ShopActivity extends AppCompatActivity {
                 slot.setOnClickListener(null);
             }
         }
+        TextView pageText = findViewById(R.id.inv_page_text);
+        if (pageText != null) pageText.setText((invPage + 1) + "/3");
     }
 
     private void showItemDescription(final Item item, final boolean isSellMode) {
@@ -329,19 +334,33 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     public void SHOPnextPage(View view) {
-        if (currentPage < 2) {
-            currentPage++;
+        if (shopPage < 2) {
+            shopPage++;
             itemInfoPanel.setVisibility(View.INVISIBLE);
             updateShopUI();
-            updateInventoryUI();
         }
     }
 
     public void SHOPprevPage(View view) {
-        if (currentPage > 0) {
-            currentPage--;
+        if (shopPage > 0) {
+            shopPage--;
             itemInfoPanel.setVisibility(View.INVISIBLE);
             updateShopUI();
+        }
+    }
+
+    public void INVnextPage(View view) {
+        if (invPage < 2) {
+            invPage++;
+            itemInfoPanel.setVisibility(View.INVISIBLE);
+            updateInventoryUI();
+        }
+    }
+
+    public void INVprevPage(View view) {
+        if (invPage > 0) {
+            invPage--;
+            itemInfoPanel.setVisibility(View.INVISIBLE);
             updateInventoryUI();
         }
     }

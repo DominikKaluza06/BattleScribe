@@ -31,6 +31,7 @@ public class CraftingActivity extends AppCompatActivity {
 
     private View craftingPanel;
     private TextView selectedRecipeName;
+    private View tvRequirementsLabel;
     private LinearLayout requirementsContainer;
     private Button btnCraft;
 
@@ -45,6 +46,7 @@ public class CraftingActivity extends AppCompatActivity {
         // Initialize UI components
         craftingPanel = findViewById(R.id.crafting_panel);
         selectedRecipeName = findViewById(R.id.selected_recipe_name);
+        tvRequirementsLabel = findViewById(R.id.tv_requirements);
         requirementsContainer = findViewById(R.id.requirements_container);
         btnCraft = findViewById(R.id.btn_craft);
 
@@ -65,9 +67,6 @@ public class CraftingActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Hides system bars for a full-screen game experience.
-     */
     private void hideSystemUI() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             final WindowInsetsController controller = getWindow().getInsetsController();
@@ -94,9 +93,6 @@ public class CraftingActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Dynamically populates the recipe grid with item icons.
-     */
     private void setupRecipes() {
         List<Recipe> recipes = RecipeDB.getAllRecipes();
         for (int i = 0; i < recipeSlotIds.length; i++) {
@@ -107,7 +103,6 @@ public class CraftingActivity extends AppCompatActivity {
                 if (resultItem != null) {
                     slot.setImageBitmap(resultItem.iconBitmap);
                     slot.setVisibility(View.VISIBLE);
-                    // Click to view recipe details
                     slot.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -121,40 +116,42 @@ public class CraftingActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Updates the UI to show required materials for the selected item.
-     * Checks availability of materials in player's inventory.
-     */
     private void showRecipe(Recipe recipe) {
         selectedRecipe = recipe;
         Item item = ItemDB.getItem(recipe.resultItemId);
-        selectedRecipeName.setText(item.name);
+        if (item == null) return;
         
+        selectedRecipeName.setText(item.name);
         requirementsContainer.removeAllViews();
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
+        
+        float density = getResources().getDisplayMetrics().density;
+        int iconSize = (int) (50 * density); 
         
         boolean canCraft = true;
         for (Map.Entry<Integer, Integer> entry : recipe.materialsRequired.entrySet()) {
             Material mat = MaterialDB.getMaterial(entry.getKey());
+            if (mat == null) continue;
+            
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             int required = entry.getValue();
             
-            // Build visual requirement indicator
             LinearLayout matLayout = new LinearLayout(this);
             matLayout.setOrientation(LinearLayout.VERTICAL);
             matLayout.setGravity(Gravity.CENTER);
-            matLayout.setPadding(16, 0, 16, 0);
+            matLayout.setPadding((int)(12 * density), 0, (int)(12 * density), 0);
 
             ImageView iv = new ImageView(this);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, 100);
-            iv.setLayoutParams(lp);
+            iv.setLayoutParams(new LinearLayout.LayoutParams(iconSize, iconSize));
             iv.setImageBitmap(mat.iconBitmap);
+            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
             
             TextView tv = new TextView(this);
             tv.setText(owned + "/" + required);
-            // Change text color to red if materials are insufficient
             tv.setTextColor(owned >= required ? Color.WHITE : Color.RED); 
             tv.setGravity(Gravity.CENTER);
+            tv.setTextSize(14);
+            tv.setShadowLayer(2, 1, 1, Color.BLACK);
 
             matLayout.addView(iv);
             matLayout.addView(tv);
@@ -166,19 +163,17 @@ public class CraftingActivity extends AppCompatActivity {
         }
         
         btnCraft.setEnabled(canCraft);
+        tvRequirementsLabel.setVisibility(View.VISIBLE);
+        btnCraft.setVisibility(View.VISIBLE);
         craftingPanel.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Finalizes the crafting process: deducts materials and grants the item.
-     */
     private void craftItem() {
         if (selectedRecipe == null) return;
         
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
         SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         
-        // Final validation of material quantities
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             if (owned < entry.getValue()) {
@@ -187,7 +182,6 @@ public class CraftingActivity extends AppCompatActivity {
             }
         }
 
-        // Deduct materials from inventory
         SharedPreferences.Editor editor = matPrefs.edit();
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
@@ -195,16 +189,12 @@ public class CraftingActivity extends AppCompatActivity {
         }
         editor.apply();
 
-        // Mark the resulting item as owned by the player
         itemPrefs.edit().putBoolean("owned_" + selectedRecipe.resultItemId, true).apply();
         
         Toast.makeText(this, "Crafted " + ItemDB.getItem(selectedRecipe.resultItemId).name + "!", Toast.LENGTH_SHORT).show();
-        showRecipe(selectedRecipe); // Refresh UI state
+        showRecipe(selectedRecipe); 
     }
 
-    /**
-     * Connects bottom navigation buttons manually (standard anonymous classes).
-     */
     private void setupNavigation() {
         findViewById(R.id.shop).setOnClickListener(new View.OnClickListener() {
             @Override

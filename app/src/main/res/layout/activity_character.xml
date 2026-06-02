@@ -29,6 +29,7 @@
             android:layout_height="110dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:contentDescription="@null"
             android:src="@mipmap/ic_launcher"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +43,7 @@
             android:backgroundTint="#FF4444"
             android:onClick="resetGame"
             android:text="@string/btn_reset"
-            android:textSize="10sp"
+            android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -98,25 +99,25 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="4dp">
                 <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="STR:" android:textColor="#FFFFFF" android:textSize="16sp" />
                 <TextView android:id="@+id/tv_STR" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseStr" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" android:tint="#FFFFFF" />
+                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseStr" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="4dp">
                 <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="VIT:" android:textColor="#FFFFFF" android:textSize="16sp" />
                 <TextView android:id="@+id/tv_VIT" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseVit" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" android:tint="#FFFFFF" />
+                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseVit" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="4dp">
                 <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="MGC:" android:textColor="#FFFFFF" android:textSize="16sp" />
                 <TextView android:id="@+id/tv_MGC" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseMgc" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" android:tint="#FFFFFF" />
+                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseMgc" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
                 <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="AGI:" android:textColor="#FFFFFF" android:textSize="16sp" />
                 <TextView android:id="@+id/tv_AGI" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseAgi" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" android:tint="#FFFFFF" />
+                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseAgi" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -153,28 +154,28 @@
             app:layout_constraintTop_toBottomOf="@+id/textView2">
 
             <FrameLayout android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="4dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="4dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/helmet_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/helmet_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="4dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/armor_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/armor_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="4dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/boots_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/boots_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="4dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/ring_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/ring_slot" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -184,7 +185,7 @@
         android:id="@+id/inventory_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/nav_top_line"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/equipment_section">
@@ -200,43 +201,43 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot1" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot1" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot2" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot2" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot3" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot3" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot4" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot4" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot5" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot5" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot6" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot6" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot7" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot7" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
 
             <FrameLayout android:layout_width="75dp" android:layout_height="75dp" android:layout_margin="6dp">
-                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
-                <ImageView android:id="@+id/weapon_slot8" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" />
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" android:contentDescription="@null" />
+                <ImageView android:id="@+id/weapon_slot8" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="14dp" android:scaleType="fitCenter" android:contentDescription="@null" />
             </FrameLayout>
         </GridLayout>
 
@@ -252,7 +253,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/INVsitePage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/INVsitePage"
-            app:srcCompat="@drawable/button_right" />
+            app:srcCompat="@drawable/button_right"
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/INVsitePage"
@@ -278,7 +280,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/INVsitePage"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/INVsitePage"
-            app:srcCompat="@drawable/button_right" />
+            app:srcCompat="@drawable/button_right"
+            android:contentDescription="@null" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- INFO OVERLAY -->
@@ -291,11 +294,11 @@
         android:padding="16dp"
         android:visibility="gone"
         android:elevation="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/nav_top_line"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView android:id="@+id/selected_char_item_icon" android:layout_width="80dp" android:layout_height="80dp" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" />
+        <ImageView android:id="@+id/selected_char_item_icon" android:layout_width="80dp" android:layout_height="80dp" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" android:contentDescription="@null" />
         <TextView android:id="@+id/selected_char_item_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" app:layout_constraintEnd_toStartOf="@+id/char_item_action_button" app:layout_constraintStart_toEndOf="@+id/selected_char_item_icon" app:layout_constraintTop_toTopOf="parent" />
         <TextView android:id="@+id/selected_char_item_desc" android:layout_width="0dp" android:layout_height="0dp" android:layout_marginStart="16dp" android:textColor="#DDDDDD" android:textSize="14sp" app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="8dp" app:layout_constraintEnd_toStartOf="@+id/char_item_action_button" app:layout_constraintStart_toEndOf="@+id/selected_char_item_icon" app:layout_constraintTop_toBottomOf="@+id/selected_char_item_name" />
         <Button android:id="@+id/char_item_action_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:backgroundTint="#4CAF50" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
@@ -303,21 +306,89 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- NAVIGATION -->
+    <View
+        android:id="@+id/nav_top_line"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#3E2723"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:orientation="horizontal"
-        android:background="#222222"
+        android:layout_height="60dp"
+        android:background="@drawable/light_background"
         android:elevation="10dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-        <ImageView android:id="@+id/shop" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_compass" />
-        <ImageView android:id="@+id/skills" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_manage" />
-        <ImageView android:id="@+id/adventure" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_mapmode" />
-        <ImageView android:id="@+id/crafting" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_edit" />
-        <ImageView android:id="@+id/character" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" android:background="#44FFFFFF" app:srcCompat="@android:drawable/ic_menu_myplaces" />
+
+        <ImageView
+            android:id="@+id/shop"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            app:srcCompat="@drawable/shop"
+            android:contentDescription="@null" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#3E2723" />
+
+        <ImageView
+            android:id="@+id/skills"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="2dp"
+            app:srcCompat="@drawable/skills"
+            android:contentDescription="@null" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#3E2723" />
+
+        <ImageView
+            android:id="@+id/adventure"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            app:srcCompat="@drawable/map"
+            android:contentDescription="@null" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#3E2723" />
+
+        <ImageView
+            android:id="@+id/crafting"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            app:srcCompat="@drawable/crafting"
+            android:contentDescription="@null" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#3E2723" />
+
+        <ImageView
+            android:id="@+id/character"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#44FFFFFF"
+            android:padding="12dp"
+            app:srcCompat="@drawable/charcter"
+            android:contentDescription="@null" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

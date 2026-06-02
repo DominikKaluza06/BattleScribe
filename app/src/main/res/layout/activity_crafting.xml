@@ -2,99 +2,142 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/inv_background"
     tools:context=".CraftingActivity">
 
+    <!-- Overall Dark Filter -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#44000000" />
+        android:background="#66000000" />
 
-    <ImageView
-        android:id="@+id/header_bg"
+    <!-- 1. Header Section -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/crafting_header"
         android:layout_width="0dp"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:background="@drawable/medium_background"
-        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/crafting_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CRAFTING"
-        android:textColor="#FFFFFF"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:shadowColor="#000000"
-        android:shadowRadius="3"
-        app:layout_constraintBottom_toBottomOf="@+id/header_bg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/crafting_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_crafting"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/tv_available_recipes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="RECIPES:"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_bg" />
-
-    <GridLayout
-        android:id="@+id/recipe_grid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnCount="4"
-        android:rowCount="2"
+    <!-- 2. Recipes Selection Grid -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/recipe_section"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@drawable/light_background"
-        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/separator_line"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_available_recipes">
+        app:layout_constraintTop_toBottomOf="@+id/crafting_header"
+        app:layout_constraintVertical_weight="1.2">
 
-        <ImageView android:id="@+id/recipe_slot1" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot2" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot3" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot4" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot5" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot6" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot7" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-        <ImageView android:id="@+id/recipe_slot8" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="8dp" android:background="#443E2723" android:padding="4dp" android:scaleType="fitCenter"/>
-    </GridLayout>
+        <TextView
+            android:id="@+id/label_recipes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/label_recipes"
+            android:textColor="#3E2723"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <GridLayout
+            android:id="@+id/recipe_grid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:rowCount="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/label_recipes">
+
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot1" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot2" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot3" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot4" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot5" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot6" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot7" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+            <FrameLayout android:layout_width="70dp" android:layout_height="70dp" android:layout_margin="6dp">
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/frame" android:scaleType="fitXY" />
+                <ImageView android:id="@+id/recipe_slot8" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp" android:scaleType="fitCenter" />
+            </FrameLayout>
+        </GridLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Separator Line -->
+    <View
+        android:id="@+id/separator_line"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#3E2723"
+        app:layout_constraintBottom_toTopOf="@+id/crafting_panel"
+        app:layout_constraintTop_toBottomOf="@+id/recipe_section" />
+
+    <!-- 3. Crafting Panel -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/crafting_panel"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_height="0dp"
         android:background="@drawable/medium_background"
-        android:padding="16dp"
-        android:visibility="invisible"
-        android:elevation="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        android:padding="12dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/nav_top_line"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recipe_grid"
-        app:layout_constraintVertical_bias="0.3">
+        app:layout_constraintTop_toBottomOf="@+id/separator_line"
+        app:layout_constraintVertical_weight="1">
 
         <TextView
             android:id="@+id/selected_recipe_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Item Name"
+            android:text=""
             android:textColor="#FFFFFF"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -103,9 +146,11 @@
             android:id="@+id/tv_requirements"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Required Materials:"
+            android:layout_marginTop="2dp"
+            android:text="@string/label_required_materials"
             android:textColor="#DDDDDD"
+            android:textSize="12sp"
+            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/selected_recipe_name" />
 
@@ -113,8 +158,9 @@
             android:id="@+id/horizontalScrollView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_craft"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_requirements">
 
@@ -122,6 +168,7 @@
                 android:id="@+id/requirements_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
@@ -129,32 +176,43 @@
             android:id="@+id/btn_craft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:backgroundTint="#4CAF50"
-            android:text="CRAFT"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_craft"
+            android:textSize="12sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
-
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Bottom Navigation -->
+    <!-- 4. Bottom Navigation -->
+    <View
+        android:id="@+id/nav_top_line"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#3E2723"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
+        android:background="@drawable/light_background"
+        android:elevation="10dp"
         android:orientation="horizontal"
-        android:background="#222222"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView android:id="@+id/shop" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_compass" />
-        <ImageView android:id="@+id/skills" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_manage" />
-        <ImageView android:id="@+id/adventure" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_mapmode" />
-        <ImageView android:id="@+id/crafting" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" android:background="#44FFFFFF" app:srcCompat="@android:drawable/ic_menu_edit" />
-        <ImageView android:id="@+id/character" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@android:drawable/ic_menu_myplaces" />
+        <ImageView android:id="@+id/shop" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/shop" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/skills" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="0dp" app:srcCompat="@drawable/skills" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/adventure" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/map" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/crafting" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#44FFFFFF" android:padding="12dp" app:srcCompat="@drawable/crafting" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/character" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/charcter" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

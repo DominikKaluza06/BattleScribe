@@ -28,6 +28,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="24dp"
@@ -67,6 +68,7 @@
                 android:visibility="gone"
                 android:background="#44000000"
                 android:padding="8dp"
+                android:contentDescription="@null"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_story_text" />
@@ -78,7 +80,9 @@
         android:id="@+id/btn_next"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_margin="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/light_background"
         android:text="NEXT"
         android:textColor="#3E2723"
@@ -94,13 +98,43 @@
         android:layout_height="50dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:text="LEAVE STORY"
         android:textColor="#FF4444"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/nav_top_line"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 5. Bottom Navigation -->
+    <View
+        android:id="@+id/nav_top_line"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#3E2723"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@drawable/light_background"
+        android:elevation="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView android:id="@+id/shop" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/shop" android:contentDescription="@null" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/skills" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="0dp" app:srcCompat="@drawable/skills" android:contentDescription="@null" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/adventure" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/map" android:background="#44FFFFFF" android:contentDescription="@null" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/crafting" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/crafting" android:contentDescription="@null" />
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#3E2723" />
+        <ImageView android:id="@+id/character" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="12dp" app:srcCompat="@drawable/charcter" android:contentDescription="@null" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

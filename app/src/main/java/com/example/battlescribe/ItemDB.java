@@ -19,143 +19,129 @@ public class ItemDB {
      * @param context Application context used to load resources.
      */
     public static void init(Context context) {
-        // Prevent re-initialization if the database is already populated
         if (!allItems.isEmpty()) {
             return;
         }
 
-        // Set options to load bitmaps without scaling to maintain pixel art quality
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
 
-        // Load sprite sheets and placeholders
+        // Load sprite sheets
         Bitmap swordSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.swords, options);
+        Bitmap mainSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_rpg_items_icons_48x48px, options);
         Bitmap placeholder = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_gallery);
 
         int swordSize = 32;
+        int mainSize = 48;
         
         // --- WEAPONS ---
         
-        // Iron Sword: Basic starting weapon
         addItem(new Item(
-            101,              // ID
-            "Iron Sword",     // Name
-            Bitmap.createBitmap(swordSheet, 0, 0, swordSize, swordSize), // Icon
-            SlotType.WEAPON,  // Equipment Slot
-            5,                // Strength Bonus
-            0,                // Vitality Bonus
-            0,                // Magic Bonus
-            0,                // Agility Bonus
-            50,               // Price (Gold)
-            1                 // Required Chapter
+            101,              
+            "Iron Sword",     
+            Bitmap.createBitmap(swordSheet, 0, 0, swordSize, swordSize), 
+            SlotType.WEAPON,  
+            5,                
+            0,                
+            0,                
+            0,                
+            50,               
+            1                 
         ));
 
-        // Steel Sword: Mid-tier weapon
         addItem(new Item(
             102, 
             "Steel Sword", 
             Bitmap.createBitmap(swordSheet, 32, 0, swordSize, swordSize), 
             SlotType.WEAPON, 
-            10, // STR
-            0,  // VIT
-            0,  // MGC
-            0,  // AGI
+            10, 
+            0,  
+            0,  
+            0,  
             150, 
             1
         ));
 
-        // Bloodstone Sword: Powerful late-game weapon
         addItem(new Item(
             103, 
             "Bloodstone Sword", 
             Bitmap.createBitmap(swordSheet, 128, 0, swordSize, swordSize), 
             SlotType.WEAPON, 
-            18, // STR
-            2,  // VIT
-            0,  // MGC
-            0,  // AGI
+            18, 
+            2,  
+            0,  
+            0,  
             500, 
             2
         ));
         
         // --- ARMOR ---
         
-        // Iron Plate: Basic heavy armor
         addItem(new Item(
             201, 
             "Iron Plate", 
             placeholder, 
             SlotType.ARMOR, 
-            0,   // STR
-            8,   // VIT
-            0,   // MGC
-            -2,  // AGI penalty
+            0,   
+            8,   
+            0,   
+            -2,  
             100, 
             1
         ));
 
-        // Steel Plate: Advanced heavy armor
         addItem(new Item(
             202, 
             "Steel Plate", 
             placeholder, 
             SlotType.ARMOR, 
-            0,  // STR
-            15, // VIT
-            0,  // MGC
-            -4, // AGI penalty
+            0,  
+            15, 
+            0,  
+            -4, 
             300, 
             2
         ));
 
         // --- BOOTS ---
         
-        // Leather Boots: Significant speed boost
+        // Straw Boots (Renamed from Running Shoes) - Row 4, Column 21 (x=1008, y=192)
         addItem(new Item(
-            301, 
-            "Leather Boots", 
-            placeholder, 
+            302, 
+            "Straw Boots", 
+            Bitmap.createBitmap(mainSheet, 1008, 192, mainSize, mainSize), 
             SlotType.BOOTS, 
-            0,  // STR
-            2,  // VIT
-            0,  // MGC
-            50, // AGI bonus
-            200, 
+            0,  
+            0,  
+            0,  
+            15, 
+            80, 
             1
         ));
 
-        // Running Shoes: Entry level speed boost
+        // Leather Boots - Row 4, Column 22 (x=1056, y=192)
         addItem(new Item(
-            302, 
-            "Running Shoes", 
-            placeholder, 
+            301, 
+            "Leather Boots", 
+            Bitmap.createBitmap(mainSheet, 1056, 192, mainSize, mainSize), 
             SlotType.BOOTS, 
-            0,  // STR
-            0,  // VIT
-            0,  // MGC
-            15, // AGI bonus
-            80, 
+            0,  
+            2,  
+            0,  
+            50, 
+            200, 
             1
         ));
     }
 
-    /**
-     * @return A collection of all items currently in the database.
-     */
     public static java.util.Collection<Item> getAllItems() {
         return allItems.values();
     }
 
-    /**
-     * Helper method to add an item to the map.
-     */
     private static void addItem(Item item) {
         allItems.put(item.id, item);
     }
 
-    /**
-     * Retrieves an item by its unique ID.
-     */
     public static Item getItem(int id) {
         return allItems.get(id);
     }

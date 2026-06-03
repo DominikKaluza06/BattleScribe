@@ -280,6 +280,8 @@ public class ShopActivity extends AppCompatActivity {
             actionButton.setText(getString(R.string.btn_buy) + " (" + displayPrice + ")");
             actionButton.setEnabled(playerGold >= item.price);
         }
+        actionButton.setVisibility(View.VISIBLE);
+        findViewById(R.id.close_button).setVisibility(View.VISIBLE);
     }
 
     private String formatStat(String label, int value) {
@@ -309,8 +311,7 @@ public class ShopActivity extends AppCompatActivity {
         Toast.makeText(this, getString(R.string.toast_bought, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
-        itemInfoPanel.setVisibility(View.INVISIBLE);
-        selectedItem = null;
+        closeInfoPanel(null);
     }
 
     public void sellItem() {
@@ -325,18 +326,24 @@ public class ShopActivity extends AppCompatActivity {
         Toast.makeText(this, getString(R.string.toast_sold, selectedItem.name), Toast.LENGTH_SHORT).show();
         updateGoldUI();
         loadInventory();
-        itemInfoPanel.setVisibility(View.INVISIBLE);
-        selectedItem = null;
+        closeInfoPanel(null);
     }
 
     private void saveGold() {
         getSharedPreferences("CharacterStats", MODE_PRIVATE).edit().putInt("gold", playerGold).apply();
     }
 
+    public void closeInfoPanel(View view) {
+        if (itemInfoPanel != null) {
+            itemInfoPanel.setVisibility(View.INVISIBLE);
+            selectedItem = null;
+        }
+    }
+
     public void SHOPnextPage(View view) {
         if (shopPage < 2) {
             shopPage++;
-            itemInfoPanel.setVisibility(View.INVISIBLE);
+            closeInfoPanel(null);
             updateShopUI();
         }
     }
@@ -344,7 +351,7 @@ public class ShopActivity extends AppCompatActivity {
     public void SHOPprevPage(View view) {
         if (shopPage > 0) {
             shopPage--;
-            itemInfoPanel.setVisibility(View.INVISIBLE);
+            closeInfoPanel(null);
             updateShopUI();
         }
     }
@@ -352,7 +359,7 @@ public class ShopActivity extends AppCompatActivity {
     public void INVnextPage(View view) {
         if (invPage < 2) {
             invPage++;
-            itemInfoPanel.setVisibility(View.INVISIBLE);
+            closeInfoPanel(null);
             updateInventoryUI();
         }
     }
@@ -360,7 +367,7 @@ public class ShopActivity extends AppCompatActivity {
     public void INVprevPage(View view) {
         if (invPage > 0) {
             invPage--;
-            itemInfoPanel.setVisibility(View.INVISIBLE);
+            closeInfoPanel(null);
             updateInventoryUI();
         }
     }

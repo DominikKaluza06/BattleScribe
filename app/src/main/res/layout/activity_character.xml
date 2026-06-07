@@ -17,7 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stats_header"
         android:layout_width="0dp"
-        android:layout_height="241dp"
+        android:layout_height="280dp"
         android:background="@drawable/medium_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,77 +47,91 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_level"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- Info stack: Level, Gold, Points stacked vertically under image -->
+        <LinearLayout
+            android:id="@+id/info_stack"
+            android:layout_width="140dp"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="Level: 1"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-        <TextView
-            android:id="@+id/tv_char_gold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Gold: 0"
-            android:textColor="#FFD700"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/tv_level"
-            app:layout_constraintStart_toEndOf="@+id/tv_level" />
-
-        <TextView
-            android:id="@+id/tv_stat_points"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="Points: 0"
-            android:textColor="#00FF00"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_level"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_level" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            android:gravity="start"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView">
+
+            <TextView
+                android:id="@+id/tv_level"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Level: 1"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_char_gold"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Gold: 0"
+                android:textColor="#FFD700"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_stat_points"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Points: 0"
+                android:textColor="#00FF00"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Stats Column: STR, VIT, MGC, AGI -->
+        <LinearLayout
+            android:id="@+id/stats_column"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="@+id/imageView">
+            app:layout_constraintStart_toEndOf="@+id/info_stack"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="4dp">
-                <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="STR:" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <TextView android:id="@+id/tv_STR" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseStr" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical">
+                <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="STR:" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" />
+                <TextView android:id="@+id/tv_STR" android:layout_width="50dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <ImageButton android:layout_width="35dp" android:layout_height="35dp" android:onClick="increaseStr" android:src="@drawable/plus" android:background="?android:attr/selectableItemBackgroundBorderless" android:scaleType="fitCenter" android:contentDescription="@null" />
             </LinearLayout>
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="4dp">
-                <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="VIT:" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <TextView android:id="@+id/tv_VIT" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseVit" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical">
+                <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="VIT:" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" />
+                <TextView android:id="@+id/tv_VIT" android:layout_width="50dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <ImageButton android:layout_width="35dp" android:layout_height="35dp" android:onClick="increaseVit" android:src="@drawable/plus" android:background="?android:attr/selectableItemBackgroundBorderless" android:scaleType="fitCenter" android:contentDescription="@null" />
             </LinearLayout>
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginBottom="4dp">
-                <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="MGC:" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <TextView android:id="@+id/tv_MGC" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseMgc" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical">
+                <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="MGC:" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" />
+                <TextView android:id="@+id/tv_MGC" android:layout_width="50dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <ImageButton android:layout_width="35dp" android:layout_height="35dp" android:onClick="increaseMgc" android:src="@drawable/plus" android:background="?android:attr/selectableItemBackgroundBorderless" android:scaleType="fitCenter" android:contentDescription="@null" />
             </LinearLayout>
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-                <TextView android:layout_width="50dp" android:layout_height="wrap_content" android:text="AGI:" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <TextView android:id="@+id/tv_AGI" android:layout_width="40dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="16sp" />
-                <ImageButton android:layout_width="30dp" android:layout_height="30dp" android:onClick="increaseAgi" android:src="@android:drawable/ic_media_play" android:background="@android:color/transparent" android:scaleType="fitCenter" app:tint="#FFFFFF" android:contentDescription="@null" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical">
+                <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="AGI:" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" />
+                <TextView android:id="@+id/tv_AGI" android:layout_width="50dp" android:layout_height="wrap_content" android:text="10" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <ImageButton android:layout_width="35dp" android:layout_height="35dp" android:onClick="increaseAgi" android:src="@drawable/plus" android:background="?android:attr/selectableItemBackgroundBorderless" android:scaleType="fitCenter" android:contentDescription="@null" />
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

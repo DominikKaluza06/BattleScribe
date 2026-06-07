@@ -1,69 +1,71 @@
 package com.example.battlescribe;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Material Database: Stores all raw resources available in the game.
- * Materials are used in recipes to craft new equipment.
+ * Materials are used in recipes to craft new equipment or processed materials.
  */
 public class MaterialDB {
     private static final Map<Integer, Material> allMaterials = new HashMap<>();
 
-    /**
-     * Initializes the material list with IDs, names, and icons.
-     * @param context Required to load image resources.
-     */
     public static void init(Context context) {
         if (!allMaterials.isEmpty()) {
             return;
         }
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
-        Bitmap mainSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_rpg_items_icons_48x48px, options);
-        
-        int size = 48;
+        SpriteManager.init(context);
 
         // --- DEFINING MATERIALS ---
-        // Using estimated coordinates from the 48x48 grid
 
-        // Iron Ore: Left section, Row 4, Column 6? (x=240, y=144)
         addMaterial(new Material(
-            1,            
-            "Iron Ore",   
-            Bitmap.createBitmap(mainSheet, 240, 144, size, size)
+            1, "Bronze Ore",
+            SpriteManager.getItemSpriteRaw(SpriteManager.BRONZE_ORE_RAW[0], SpriteManager.BRONZE_ORE_RAW[1]),
+            "Obtainable in: Forest"
         ));
 
-        // Steel Bar: Left section, Row 5, Column 3 (x=96, y=192)
         addMaterial(new Material(
-            2, 
-            "Steel Bar", 
-            Bitmap.createBitmap(mainSheet, 96, 192, size, size)
+            2, "Bronze Bar",
+            SpriteManager.getItemSpriteRaw(SpriteManager.BRONZE_BAR_RAW[0], SpriteManager.BRONZE_BAR_RAW[1]),
+            "Crafted from Bronze Ore"
         ));
 
-        // Bloodstone Shard: Left section, Row 6, Column 3 (x=96, y=240)
         addMaterial(new Material(
-            3, 
-            "Bloodstone Shard", 
-            Bitmap.createBitmap(mainSheet, 96, 240, size, size)
+            9, "Iron Ore",
+            SpriteManager.getItemSpriteRaw(SpriteManager.IRON_ORE_RAW[0], SpriteManager.IRON_ORE_RAW[1]),
+            "Obtainable in: Mountain"
         ));
 
-        // Wood: Left section, Row 4, Column 2 (x=48, y=144)
         addMaterial(new Material(
-            4, 
-            "Wood", 
-            Bitmap.createBitmap(mainSheet, 48, 144, size, size)
+            6, "Iron Bar",
+            SpriteManager.getItemSpriteRaw(SpriteManager.IRON_BAR_RAW[0], SpriteManager.IRON_BAR_RAW[1]),
+            "Crafted from Iron Ore"
         ));
 
-        // Leather: Left section, Row 7, Column 2 (x=48, y=288)
         addMaterial(new Material(
-            5, 
-            "Leather", 
-            Bitmap.createBitmap(mainSheet, 48, 288, size, size)
+            3, "Bloodstone Shard",
+            SpriteManager.getItemSpriteRaw(SpriteManager.BLOODSTONE_SHARD_RAW[0], SpriteManager.BLOODSTONE_SHARD_RAW[1]),
+            "Obtainable in: Graveyard"
+        ));
+
+        addMaterial(new Material(
+            4, "Brown Wood",
+            SpriteManager.getItemSpriteRaw(SpriteManager.WOOD_RAW[0], SpriteManager.WOOD_RAW[1]),
+            "Obtainable in: Forest"
+        ));
+
+        addMaterial(new Material(
+            5, "Leather",
+            SpriteManager.getItemSpriteRaw(SpriteManager.LEATHER_RAW[0], SpriteManager.LEATHER_RAW[1]),
+            "Obtainable in: Forest"
+        ));
+
+        addMaterial(new Material(
+            8, "Stone",
+            SpriteManager.getItemSpriteRaw(SpriteManager.STONE_RAW[0], SpriteManager.STONE_RAW[1]),
+            "Obtainable in: Mountain"
         ));
     }
 

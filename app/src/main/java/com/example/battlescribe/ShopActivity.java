@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,8 +23,8 @@ import java.util.Set;
  */
 public class ShopActivity extends AppCompatActivity {
 
-    private Item[] shopItems = new Item[24];
-    private Item[] inventoryItems = new Item[24];
+    private List<Item> shopItems = new ArrayList<>();
+    private List<Item> inventoryItems = new ArrayList<>();
     
     private int shopPage = 0;
     private int invPage = 0;
@@ -168,23 +170,19 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void loadShopItems() {
-        for (int i = 0; i < 24; i++) shopItems[i] = null;
+        shopItems.clear();
         SharedPreferences storyPrefs = getSharedPreferences("StoryProgress", MODE_PRIVATE);
         int currentChapter = storyPrefs.getInt("chapter", 1);
-        int index = 0;
         for (Item item : ItemDB.getAllItems()) {
             if (item.requiredChapter <= currentChapter) {
-                if (index < 24) {
-                    shopItems[index] = item;
-                    index++;
-                }
+                shopItems.add(item);
             }
         }
         updateShopUI();
     }
 
     private void loadInventory() {
-        for (int i = 0; i < 24; i++) inventoryItems[i] = null;
+        inventoryItems.clear();
         SharedPreferences itemsPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         SharedPreferences equipPrefs = getSharedPreferences("EquippedItems", MODE_PRIVATE);
         
@@ -194,14 +192,10 @@ public class ShopActivity extends AppCompatActivity {
             if (id != -1) equippedIds.add(id);
         }
 
-        int index = 0;
         for (Item item : ItemDB.getAllItems()) {
             if (itemsPrefs.getBoolean("owned_" + item.id, false)) {
                 if (!equippedIds.contains(item.id)) {
-                    if (index < 24) {
-                        inventoryItems[index] = item;
-                        index++;
-                    }
+                    inventoryItems.add(item);
                 }
             }
         }
@@ -209,11 +203,17 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void updateShopUI() {
+        int totalPages = (int) Math.ceil(shopItems.size() / 8.0);
+        if (totalPages == 0) totalPages = 1;
+        
+        if (shopPage >= totalPages) shopPage = totalPages - 1;
+        if (shopPage < 0) shopPage = 0;
+
         int startOffset = shopPage * 8;
         for (int i = 0; i < 8; i++) {
             ImageView slot = findViewById(shopSlotIds[i]);
             int itemIndex = startOffset + i;
-            final Item item = (itemIndex < shopItems.length) ? shopItems[itemIndex] : null;
+            final Item item = (itemIndex < shopItems.size()) ? shopItems.get(itemIndex) : null;
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
                 slot.setOnClickListener(new View.OnClickListener() {
@@ -227,16 +227,32 @@ public class ShopActivity extends AppCompatActivity {
                 slot.setOnClickListener(null);
             }
         }
+        
         TextView pageText = findViewById(R.id.shop_page_text);
-        if (pageText != null) pageText.setText((shopPage + 1) + "/3");
+        if (pageText != null) {
+            pageText.setText((shopPage + 1) + "/" + totalPages);
+            pageText.setVisibility(totalPages > 1 ? View.VISIBLE : View.INVISIBLE);
+        }
+        
+        View nextBtn = findViewById(R.id.shop_next_page);
+        if (nextBtn != null) nextBtn.setVisibility(shopPage < totalPages - 1 ? View.VISIBLE : View.INVISIBLE);
+        
+        View prevBtn = findViewById(R.id.shop_prev_page);
+        if (prevBtn != null) prevBtn.setVisibility(shopPage > 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void updateInventoryUI() {
+        int totalPages = (int) Math.ceil(inventoryItems.size() / 8.0);
+        if (totalPages == 0) totalPages = 1;
+        
+        if (invPage >= totalPages) invPage = totalPages - 1;
+        if (invPage < 0) invPage = 0;
+
         int startOffset = invPage * 8;
         for (int i = 0; i < 8; i++) {
             ImageView slot = findViewById(sellSlotIds[i]);
             int itemIndex = startOffset + i;
-            final Item item = (itemIndex < inventoryItems.length) ? inventoryItems[itemIndex] : null;
+            final Item item = (itemIndex < inventoryItems.size()) ? inventoryItems.get(itemIndex) : null;
             if (item != null) {
                 slot.setImageBitmap(item.iconBitmap);
                 slot.setAlpha(1.0f);
@@ -251,8 +267,18 @@ public class ShopActivity extends AppCompatActivity {
                 slot.setOnClickListener(null);
             }
         }
+        
         TextView pageText = findViewById(R.id.inv_page_text);
-        if (pageText != null) pageText.setText((invPage + 1) + "/3");
+        if (pageText != null) {
+            pageText.setText((invPage + 1) + "/" + totalPages);
+            pageText.setVisibility(totalPages > 1 ? View.VISIBLE : View.INVISIBLE);
+        }
+        
+        View nextBtn = findViewById(R.id.inv_next_page);
+        if (nextBtn != null) nextBtn.setVisibility(invPage < totalPages - 1 ? View.VISIBLE : View.INVISIBLE);
+        
+        View prevBtn = findViewById(R.id.inv_prev_page);
+        if (prevBtn != null) prevBtn.setVisibility(invPage > 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void showItemDescription(final Item item, final boolean isSellMode) {
@@ -341,7 +367,8 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     public void SHOPnextPage(View view) {
-        if (shopPage < 2) {
+        int totalPages = (int) Math.ceil(shopItems.size() / 8.0);
+        if (shopPage < totalPages - 1) {
             shopPage++;
             closeInfoPanel(null);
             updateShopUI();
@@ -357,7 +384,8 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     public void INVnextPage(View view) {
-        if (invPage < 2) {
+        int totalPages = (int) Math.ceil(inventoryItems.size() / 8.0);
+        if (invPage < totalPages - 1) {
             invPage++;
             closeInfoPanel(null);
             updateInventoryUI();

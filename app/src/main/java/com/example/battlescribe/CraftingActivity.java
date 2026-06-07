@@ -14,26 +14,35 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Activity for crafting items using gathered materials.
- * It displays recipes and their requirements, allowing players to create new gear.
+ * It displays recipes and their requirements with a paginated grid.
  */
 public class CraftingActivity extends AppCompatActivity {
 
-    // View IDs for the 8 slots in the recipe selection grid
     private final int[] recipeSlotIds = {
             R.id.recipe_slot1, R.id.recipe_slot2, R.id.recipe_slot3, R.id.recipe_slot4,
             R.id.recipe_slot5, R.id.recipe_slot6, R.id.recipe_slot7, R.id.recipe_slot8
     };
 
+    private List<Recipe> allRecipes = new ArrayList<>();
+    private List<Recipe> filteredRecipes = new ArrayList<>();
+    private int recipePage = 0;
+    private String currentFilter = "ALL";
+
     private View craftingPanel;
+    private ImageView selectedRecipeIcon;
     private TextView selectedRecipeName;
     private View tvRequirementsLabel;
     private LinearLayout requirementsContainer;
     private Button btnCraft;
+
+    private View matSourcePanel;
+    private TextView tvMatSource;
 
     private Recipe selectedRecipe;
 
@@ -45,26 +54,76 @@ public class CraftingActivity extends AppCompatActivity {
 
         // Initialize UI components
         craftingPanel = findViewById(R.id.crafting_panel);
+        selectedRecipeIcon = findViewById(R.id.selected_recipe_icon);
         selectedRecipeName = findViewById(R.id.selected_recipe_name);
         tvRequirementsLabel = findViewById(R.id.tv_requirements);
         requirementsContainer = findViewById(R.id.requirements_container);
         btnCraft = findViewById(R.id.btn_craft);
+        matSourcePanel = findViewById(R.id.mat_source_panel);
+        tvMatSource = findViewById(R.id.tv_mat_source);
 
-        // Ensure all databases are initialized before use
+        // Ensure all databases are initialized
         ItemDB.init(this);
         MaterialDB.init(this);
         RecipeDB.init(this);
 
-        setupRecipes();
+        allRecipes = RecipeDB.getAllRecipes();
+        
+        setupFilters();
+        applyFilter("ALL");
         setupNavigation();
 
-        // Standard OnClickListener
         btnCraft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 craftItem();
             }
         });
+
+        // Tooltip dismissal
+        craftingPanel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                matSourcePanel.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void setupFilters() {
+        findViewById(R.id.filter_all).setOnClickListener(v -> applyFilter("ALL"));
+        findViewById(R.id.filter_weapon).setOnClickListener(v -> applyFilter("WEAPON"));
+        findViewById(R.id.filter_armor).setOnClickListener(v -> applyFilter("ARMOR"));
+        findViewById(R.id.filter_boots).setOnClickListener(v -> applyFilter("BOOTS"));
+        findViewById(R.id.filter_helmet).setOnClickListener(v -> applyFilter("HELMET"));
+        findViewById(R.id.filter_ring).setOnClickListener(v -> applyFilter("RING"));
+        findViewById(R.id.filter_materials).setOnClickListener(v -> applyFilter("BARS"));
+    }
+
+    private void applyFilter(String filter) {
+        currentFilter = filter;
+        filteredRecipes.clear();
+        recipePage = 0;
+
+        for (Recipe recipe : allRecipes) {
+            if (filter.equals("ALL")) {
+                filteredRecipes.add(recipe);
+            } else if (filter.equals("BARS")) {
+                // If it's a material and not an item, it's a "Bar" in this context
+                if (MaterialDB.getMaterial(recipe.resultItemId) != null && ItemDB.getItem(recipe.resultItemId) == null) {
+                    filteredRecipes.add(recipe);
+                }
+            } else {
+                // Check by SlotType
+                Item item = ItemDB.getItem(recipe.resultItemId);
+                if (item != null && item.slot.name().equals(filter)) {
+                    filteredRecipes.add(recipe);
+                }
+            }
+        }
+        
+        // Hide info panel when switching filters to avoid showing a recipe not in the current list
+        craftingPanel.setVisibility(View.INVISIBLE);
+        updateRecipeUI();
     }
 
     private void hideSystemUI() {
@@ -93,15 +152,29 @@ public class CraftingActivity extends AppCompatActivity {
         }
     }
 
-    private void setupRecipes() {
-        List<Recipe> recipes = RecipeDB.getAllRecipes();
-        for (int i = 0; i < recipeSlotIds.length; i++) {
+    private void updateRecipeUI() {
+        int totalPages = (int) Math.ceil(filteredRecipes.size() / 8.0);
+        if (totalPages == 0) totalPages = 1;
+        
+        if (recipePage >= totalPages) recipePage = totalPages - 1;
+        
+        int startOffset = recipePage * 8;
+        for (int i = 0; i < 8; i++) {
             ImageView slot = findViewById(recipeSlotIds[i]);
-            if (i < recipes.size()) {
-                final Recipe recipe = recipes.get(i);
-                Item resultItem = ItemDB.getItem(recipe.resultItemId);
-                if (resultItem != null) {
-                    slot.setImageBitmap(resultItem.iconBitmap);
+            int recipeIndex = startOffset + i;
+            if (recipeIndex < filteredRecipes.size()) {
+                final Recipe recipe = filteredRecipes.get(recipeIndex);
+                
+                android.graphics.Bitmap icon = null;
+                Item item = ItemDB.getItem(recipe.resultItemId);
+                if (item != null) icon = item.iconBitmap;
+                else {
+                    Material mat = MaterialDB.getMaterial(recipe.resultItemId);
+                    if (mat != null) icon = mat.iconBitmap;
+                }
+
+                if (icon != null) {
+                    slot.setImageBitmap(icon);
                     slot.setVisibility(View.VISIBLE);
                     slot.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -111,27 +184,56 @@ public class CraftingActivity extends AppCompatActivity {
                     });
                 }
             } else {
-                slot.setVisibility(View.GONE);
+                slot.setVisibility(View.INVISIBLE);
+                slot.setOnClickListener(null);
             }
         }
+
+        TextView pageText = findViewById(R.id.recipe_page_text);
+        if (pageText != null) {
+            pageText.setText((recipePage + 1) + "/" + totalPages);
+            pageText.setVisibility(totalPages > 1 ? View.VISIBLE : View.INVISIBLE);
+        }
+
+        View nextBtn = findViewById(R.id.recipe_next_page);
+        if (nextBtn != null) nextBtn.setVisibility(recipePage < totalPages - 1 ? View.VISIBLE : View.INVISIBLE);
+
+        View prevBtn = findViewById(R.id.recipe_prev_page);
+        if (prevBtn != null) prevBtn.setVisibility(recipePage > 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void showRecipe(Recipe recipe) {
         selectedRecipe = recipe;
+        String name = "";
+        android.graphics.Bitmap icon = null;
+        
         Item item = ItemDB.getItem(recipe.resultItemId);
-        if (item == null) return;
+        if (item != null) {
+            name = item.name;
+            icon = item.iconBitmap;
+        } else {
+            Material mat = MaterialDB.getMaterial(recipe.resultItemId);
+            if (mat != null) {
+                name = mat.name;
+                icon = mat.iconBitmap;
+            }
+        }
+
+        if (icon == null) return;
         
-        selectedRecipeName.setText(item.name);
+        selectedRecipeName.setText(name);
+        selectedRecipeIcon.setImageBitmap(icon);
         requirementsContainer.removeAllViews();
+        matSourcePanel.setVisibility(View.GONE);
+
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
-        
         float density = getResources().getDisplayMetrics().density;
-        int iconSize = (int) (50 * density); 
+        int iconSize = (int) (55 * density); 
         
         boolean canCraft = true;
         for (Map.Entry<Integer, Integer> entry : recipe.materialsRequired.entrySet()) {
-            Material mat = MaterialDB.getMaterial(entry.getKey());
-            if (mat == null) continue;
+            final Material reqMat = MaterialDB.getMaterial(entry.getKey());
+            if (reqMat == null) continue;
             
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
             int required = entry.getValue();
@@ -139,19 +241,27 @@ public class CraftingActivity extends AppCompatActivity {
             LinearLayout matLayout = new LinearLayout(this);
             matLayout.setOrientation(LinearLayout.VERTICAL);
             matLayout.setGravity(Gravity.CENTER);
-            matLayout.setPadding((int)(12 * density), 0, (int)(12 * density), 0);
+            matLayout.setPadding((int)(16 * density), 0, (int)(16 * density), 0);
 
             ImageView iv = new ImageView(this);
             iv.setLayoutParams(new LinearLayout.LayoutParams(iconSize, iconSize));
-            iv.setImageBitmap(mat.iconBitmap);
+            iv.setImageBitmap(reqMat.iconBitmap);
             iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tvMatSource.setText(reqMat.name + "\n" + reqMat.obtainableFrom);
+                    matSourcePanel.setVisibility(View.VISIBLE);
+                }
+            });
             
             TextView tv = new TextView(this);
             tv.setText(owned + "/" + required);
-            tv.setTextColor(owned >= required ? Color.WHITE : Color.RED); 
+            tv.setTextColor(owned >= required ? Color.parseColor("#3E2723") : Color.RED); 
             tv.setGravity(Gravity.CENTER);
-            tv.setTextSize(14);
-            tv.setShadowLayer(2, 1, 1, Color.BLACK);
+            tv.setTextSize(16);
+            tv.setShadowLayer(1, 0, 0, Color.WHITE);
 
             matLayout.addView(iv);
             matLayout.addView(tv);
@@ -172,7 +282,6 @@ public class CraftingActivity extends AppCompatActivity {
         if (selectedRecipe == null) return;
         
         SharedPreferences matPrefs = getSharedPreferences("MaterialInventory", MODE_PRIVATE);
-        SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
         
         for (Map.Entry<Integer, Integer> entry : selectedRecipe.materialsRequired.entrySet()) {
             int owned = matPrefs.getInt("mat_" + entry.getKey(), 0);
@@ -189,9 +298,16 @@ public class CraftingActivity extends AppCompatActivity {
         }
         editor.apply();
 
-        itemPrefs.edit().putBoolean("owned_" + selectedRecipe.resultItemId, true).apply();
+        if (ItemDB.getItem(selectedRecipe.resultItemId) != null) {
+            SharedPreferences itemPrefs = getSharedPreferences("CharacterItems", MODE_PRIVATE);
+            itemPrefs.edit().putBoolean("owned_" + selectedRecipe.resultItemId, true).apply();
+            Toast.makeText(this, "Crafted " + ItemDB.getItem(selectedRecipe.resultItemId).name + "!", Toast.LENGTH_SHORT).show();
+        } else {
+            int currentResultOwned = matPrefs.getInt("mat_" + selectedRecipe.resultItemId, 0);
+            matPrefs.edit().putInt("mat_" + selectedRecipe.resultItemId, currentResultOwned + 1).apply();
+            Toast.makeText(this, "Crafted " + MaterialDB.getMaterial(selectedRecipe.resultItemId).name + "!", Toast.LENGTH_SHORT).show();
+        }
         
-        Toast.makeText(this, "Crafted " + ItemDB.getItem(selectedRecipe.resultItemId).name + "!", Toast.LENGTH_SHORT).show();
         showRecipe(selectedRecipe); 
     }
 
@@ -231,5 +347,22 @@ public class CraftingActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void RECIPEnextPage(View view) {
+        int totalPages = (int) Math.ceil(filteredRecipes.size() / 8.0);
+        if (recipePage < totalPages - 1) {
+            recipePage++;
+            matSourcePanel.setVisibility(View.GONE);
+            updateRecipeUI();
+        }
+    }
+
+    public void RECIPEprevPage(View view) {
+        if (recipePage > 0) {
+            recipePage--;
+            matSourcePanel.setVisibility(View.GONE);
+            updateRecipeUI();
+        }
     }
 }

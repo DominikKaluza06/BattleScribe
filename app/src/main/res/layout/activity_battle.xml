@@ -129,15 +129,29 @@
         android:background="@drawable/medium_background"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageView
-            android:id="@+id/player_icon"
+        <FrameLayout
+            android:id="@+id/player_frame_layout"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@mipmap/ic_launcher"
-            android:background="#22000000"
-            android:padding="2dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="fitXY"
+                android:src="@drawable/frame" />
+
+            <ImageView
+                android:id="@+id/player_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/maincharacter" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/player_name"
@@ -152,7 +166,7 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="2"
-            app:layout_constraintStart_toEndOf="@+id/player_icon"
+            app:layout_constraintStart_toEndOf="@+id/player_frame_layout"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
@@ -213,7 +227,7 @@
             android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@+id/player_icon">
+            app:layout_constraintTop_toBottomOf="@+id/player_frame_layout">
 
             <!-- Basic Attack -->
             <ImageView
@@ -221,8 +235,8 @@
                 android:layout_width="54dp"
                 android:layout_height="54dp"
                 android:layout_margin="6dp"
-                android:background="@drawable/light_background"
-                android:padding="6dp"
+                android:background="@android:color/transparent"
+                android:padding="0dp"
                 android:scaleType="fitCenter"
                 android:elevation="4dp" />
 
@@ -237,8 +251,9 @@
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_margin="6dp"
-                    android:background="@drawable/light_background"
-                    android:padding="6dp"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
                     android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd1"
@@ -264,8 +279,9 @@
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_margin="6dp"
-                    android:background="@drawable/light_background"
-                    android:padding="6dp"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
                     android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd2"
@@ -291,8 +307,9 @@
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_margin="6dp"
-                    android:background="@drawable/light_background"
-                    android:padding="6dp"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
                     android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd3"
@@ -318,8 +335,9 @@
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_margin="6dp"
-                    android:background="@drawable/light_background"
-                    android:padding="6dp"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
                     android:elevation="4dp" />
                 <TextView
                     android:id="@+id/tv_skill_cd4"

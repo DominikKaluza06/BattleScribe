@@ -22,7 +22,7 @@ public class Goblin extends Monster {
             1 + (level - 1) * 2,         // Vitality: Base 1 + 2 per level
             (level - 1) * 2,             // Magic
             5 + (level - 1) * 2,         // Agility
-            BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_dialog_map),
+            BitmapFactory.decodeResource(context.getResources(), R.drawable.goblin),
             (10 * level) / 4,            // Gold Reward: Lowest of all enemies
             (20 * level) / 2             // EXP Reward
         );

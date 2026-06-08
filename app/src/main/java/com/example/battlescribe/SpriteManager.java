@@ -11,12 +11,14 @@ import android.graphics.BitmapFactory;
 public class SpriteManager {
     private static Bitmap mainSheet;
     private static Bitmap swordSheet;
+    private static Bitmap skillSheet;
     
     private static final int GRID_SIZE_48 = 48;
     private static final int SWORD_SIZE_32 = 32;
+    private static final int SKILL_SIZE_62 = 62;
 
     public static void init(Context context) {
-        if (mainSheet != null && swordSheet != null) return;
+        if (mainSheet != null && swordSheet != null && skillSheet != null) return;
         
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
@@ -26,6 +28,9 @@ public class SpriteManager {
         }
         if (swordSheet == null) {
             swordSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.swords, options);
+        }
+        if (skillSheet == null) {
+            skillSheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.skill_icons_62x62, options);
         }
     }
 
@@ -67,6 +72,17 @@ public class SpriteManager {
         return Bitmap.createBitmap(swordSheet, x, y, SWORD_SIZE_32, SWORD_SIZE_32);
     }
 
+    /**
+     * Extracts a 62x62 sprite from the skill sheet using exact pixel coordinates.
+     */
+    public static Bitmap getSkillSpriteRaw(int x, int y) {
+        if (skillSheet == null) return null;
+        if (x < 0 || y < 0 || x + SKILL_SIZE_62 > skillSheet.getWidth() || y + SKILL_SIZE_62 > skillSheet.getHeight()) {
+            return null;
+        }
+        return Bitmap.createBitmap(skillSheet, x, y, SKILL_SIZE_62, SKILL_SIZE_62);
+    }
+
     // --- SPRITE COORDINATE TABLE ---
 
     // Weapons (Sword Sheet - 32x32)
@@ -93,6 +109,13 @@ public class SpriteManager {
     public static final int[] IRON_BAR_RAW = {622, 482};
     public static final int[] LEATHER_RAW = {384, 670};
     public static final int[] BLOODSTONE_SHARD_RAW = {94, 820};
+
+    // Skills (Skill Sheet - 62x62) - Fixed Pixel Coordinates
+    // Power Strike starts at (496, 186).
+    // Fireball starts at (124, 248). Next ones count from there.
+    public static final int[] POWER_STRIKE_PX = {496, 186};
+    public static final int[] FIREBALL_PX = {124, 248};
+    public static final int[] HEAL_PX = {620, 186};
 
     // Legacy / Other Materials
     public static final int[] LEATHER_MAT = {14, 7};

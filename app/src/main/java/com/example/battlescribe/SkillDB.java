@@ -1,8 +1,6 @@
 package com.example.battlescribe;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,14 +16,14 @@ public class SkillDB {
     public static void init(Context context) {
         if (!allSkills.isEmpty()) return;
         
-        Bitmap placeholderIcon = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_compass);
+        SpriteManager.init(context);
 
         // Power Strike: A physical skill that scales primarily with Strength.
         addSkill(new Skill(
             1,                // ID
             "Power Strike",   // Name
             "A powerful blow that deals 1.3x STR damage.", // Description
-            placeholderIcon,  // Icon
+            SpriteManager.getSkillSpriteRaw(SpriteManager.POWER_STRIKE_PX[0], SpriteManager.POWER_STRIKE_PX[1]),  // Icon
             0,                // Base Value
             5,                // Mana Cost
             1,                // Required Level
@@ -42,7 +40,7 @@ public class SkillDB {
             2, 
             "Heal", 
             "Restores health (15% Max HP + MGC bonus).", 
-            placeholderIcon, 
+            SpriteManager.getSkillSpriteRaw(SpriteManager.HEAL_PX[0], SpriteManager.HEAL_PX[1]), 
             0, 
             10, 
             3, 
@@ -59,7 +57,7 @@ public class SkillDB {
             3, 
             "Fireball", 
             "Launches a fireball dealing 1.3x MGC damage.", 
-            placeholderIcon, 
+            SpriteManager.getSkillSpriteRaw(SpriteManager.FIREBALL_PX[0], SpriteManager.FIREBALL_PX[1]), 
             0, 
             15, 
             5, 

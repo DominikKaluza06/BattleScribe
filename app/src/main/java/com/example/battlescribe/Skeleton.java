@@ -17,7 +17,7 @@ public class Skeleton extends Monster {
             (level - 1) * 2,             // Vitality: Base 0 + 2 per level
             (level - 1) * 2,             // Magic
             8 + (level - 1) * 2,         // Agility: Base 8 + 2 per level (High speed)
-            BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_help),
+            BitmapFactory.decodeResource(context.getResources(), R.drawable.skeleton),
             (20 * level) / 4,            // Gold Reward
             (40 * level) / 2             // EXP Reward
         );

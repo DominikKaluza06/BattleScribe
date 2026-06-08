@@ -18,7 +18,7 @@ public class Zombie extends Monster {
             (level - 1) * 2,             // Vitality: Base 0, +2 per level (Defense is nerfed to 1/3 in Entity.java)
             (level - 1) * 2,             // Magic: Base 0, +2 per level
             3 + (level - 1) * 2,         // Agility: Base 3, +2 per level (Increases Speed/Crit)
-            BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_report_image),
+            BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie),
             (15 * level) / 4,           // Gold Reward: Scaled and balanced
             (25 * level) / 2            // EXP Reward: Scaled and balanced
         );

@@ -231,25 +231,6 @@ public class Character extends AppCompatActivity {
         hideItemInfo();
     }
 
-    /**
-     * Wipes all persistent data for a fresh start.
-     */
-    public void resetGame(View view) {
-        getSharedPreferences("CharacterStats", MODE_PRIVATE).edit().clear().commit();
-        getSharedPreferences("CharacterItems", MODE_PRIVATE).edit().clear().commit();
-        getSharedPreferences("EquippedItems", MODE_PRIVATE).edit().clear().commit();
-        getSharedPreferences("CharacterSkills", MODE_PRIVATE).edit().clear().commit();
-        getSharedPreferences("BattleProgress", MODE_PRIVATE).edit().clear().commit();
-        getSharedPreferences("MaterialInventory", MODE_PRIVATE).edit().clear().commit();
-        getSharedPreferences("StoryProgress", MODE_PRIVATE).edit().clear().commit();
-        
-        Toast.makeText(this, getString(R.string.toast_reset_fresh), Toast.LENGTH_SHORT).show();
-        
-        loadEquippedItems();
-        loadInventory();
-        refreshStatsUI();
-        hideItemInfo();
-    }
 
     /**
      * Prepares and shows the item description panel.

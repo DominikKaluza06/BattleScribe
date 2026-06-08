@@ -20,6 +20,8 @@ public class StoryActivity extends AppCompatActivity {
 
     private TextView tvStoryText;
     private ImageView ivRewardIcon;
+    private View speakerLayout;
+    private ImageView ivSpeakerIcon;
     private Button btnNext;
     private int currentChapter = 1;
     private int storyStep = 0;
@@ -28,7 +30,7 @@ public class StoryActivity extends AppCompatActivity {
     private Handler typingHandler = new Handler();
     private String fullText = "";
     private int charIndex = 0;
-    private static final long TYPING_DELAY = 100; // 100ms per character
+    private static final long TYPING_DELAY = 60; // Faster typing for better feel
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,8 @@ public class StoryActivity extends AppCompatActivity {
         // Initialize UI components
         tvStoryText = findViewById(R.id.tv_story_text);
         ivRewardIcon = findViewById(R.id.iv_reward_icon);
+        speakerLayout = findViewById(R.id.speaker_frame_layout);
+        ivSpeakerIcon = findViewById(R.id.iv_speaker_icon);
         btnNext = findViewById(R.id.btn_next);
 
         // Load saved progress from SharedPreferences
@@ -76,6 +80,14 @@ public class StoryActivity extends AppCompatActivity {
         charIndex = 0;
         tvStoryText.setText("");
         typingHandler.removeCallbacks(typingRunnable);
+        
+        // Logic to show player icon if the text indicates player speech
+        if (text.startsWith("You:") || text.contains("Hero:")) {
+            speakerLayout.setVisibility(View.VISIBLE);
+        } else {
+            speakerLayout.setVisibility(View.GONE);
+        }
+        
         typingHandler.postDelayed(typingRunnable, TYPING_DELAY);
     }
 
@@ -115,7 +127,7 @@ public class StoryActivity extends AppCompatActivity {
                 .apply();
 
         // Check if we reached a point where a battle should start
-        if (currentChapter == 1 && storyStep > 4) {
+        if (currentChapter == 1 && storyStep > 5) {
             startBattle(1, "Goblin");
         } else if (currentChapter == 2 && storyStep > 2) {
              startBattle(2, "Skeleton");
@@ -163,10 +175,10 @@ public class StoryActivity extends AppCompatActivity {
                 startTypewriter("Chapter 1.1: You wake up in a small village surrounded by mist. An old man approaches you.");
                 break;
             case 1:
-                startTypewriter("Chapter 1.2: Old Man: 'Young scribe, the world is in danger. Take this, it was my father\\'s.'");
+                startTypewriter("Old Man: 'Young scribe, the world is in danger. Take this, it was my father\\'s.'");
                 break;
             case 2:
-                startTypewriter("Chapter 1.3: You received an Iron Sword! Check your inventory to equip it.");
+                startTypewriter("You received an Iron Sword! Check your inventory to equip it.");
                 giveReward(101);
                 ivRewardIcon.setVisibility(View.VISIBLE);
                 Item ironSword = ItemDB.getItem(101);
@@ -175,9 +187,12 @@ public class StoryActivity extends AppCompatActivity {
                 }
                 break;
             case 3:
-                startTypewriter("Chapter 1.4: Old Man: 'Goblins have been spotted near the gates. You must protect the village!'");
+                startTypewriter("You: 'Thank you, elder. I will use this to defend the village.'");
                 break;
             case 4:
+                startTypewriter("Old Man: 'Goblins have been spotted near the gates. You must protect the village!'");
+                break;
+            case 5:
                 startTypewriter("Chapter 1.5: You head towards the gate. Suddenly, a Goblin jumps out of the shadows!");
                 btnNext.setText("BATTLE!");
                 break;

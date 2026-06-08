@@ -40,6 +40,8 @@ public class BattleActivity extends AppCompatActivity {
      * When it reaches 100, the player takes a turn.
      */
     private int playerCharge = 0; 
+    private int consecutivePlayerTurns = 0;
+    private int consecutiveMonsterTurns = 0;
     
     private Item equippedWeapon;
     private Map<SlotType, Item> equippedItems = new HashMap<>();
@@ -256,6 +258,7 @@ public class BattleActivity extends AppCompatActivity {
     /**
      * CTB Processing: Increments charge values based on speed.
      * Speed is derived from Agility.
+     * Implements a 2-turn consecutive limit to prevent agility exploitation.
      */
     private void processCTB() {
         if (activeMonster.isDead() || playerCurrentHp <= 0) return;
@@ -275,13 +278,47 @@ public class BattleActivity extends AppCompatActivity {
             activeMonster.addCharge(mSpeed);
         }
 
-        if (playerCharge >= 100) {
-            playerCharge -= 100; // Deduct cost of turn
+        // Decide who takes the turn, respecting the 2-turn cap
+        boolean canPlayerGo = (playerCharge >= 100 && consecutivePlayerTurns < 2);
+        boolean canMonsterGo = (activeMonster.getCurrentCharge() >= 100 && consecutiveMonsterTurns < 2);
+
+        if (canPlayerGo) {
+            // Player takes turn if they have charge and haven't hit the cap
+            playerCharge -= 100;
             isPlayerTurn = true;
+            consecutivePlayerTurns++;
+            consecutiveMonsterTurns = 0;
             log(getString(R.string.battle_log_your_turn));
-        } else {
-            activeMonster.reduceCharge(100); // Deduct cost of turn
+        } else if (canMonsterGo) {
+            // Monster takes turn if they have charge and haven't hit the cap
+            activeMonster.reduceCharge(100);
+            consecutiveMonsterTurns++;
+            consecutivePlayerTurns = 0;
             monsterTurn();
+        } else {
+            // If the person who reached 100 is capped, we must force the other to reach 100
+            if (consecutivePlayerTurns >= 2) {
+                // Force monster turn
+                while (activeMonster.getCurrentCharge() < 100) {
+                    playerCharge += pSpeed;
+                    activeMonster.addCharge(mSpeed);
+                }
+                activeMonster.reduceCharge(100);
+                consecutiveMonsterTurns++;
+                consecutivePlayerTurns = 0;
+                monsterTurn();
+            } else {
+                // Force player turn (monster was capped)
+                while (playerCharge < 100) {
+                    playerCharge += pSpeed;
+                    activeMonster.addCharge(mSpeed);
+                }
+                playerCharge -= 100;
+                isPlayerTurn = true;
+                consecutivePlayerTurns++;
+                consecutiveMonsterTurns = 0;
+                log(getString(R.string.battle_log_your_turn));
+            }
         }
     }
 

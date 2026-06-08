@@ -106,7 +106,7 @@ public class SpriteManager {
     public static final int[] BRONZE_ORE_RAW = {574, 437};
     public static final int[] IRON_ORE_RAW = {622, 437};
     public static final int[] BRONZE_BAR_RAW = {574, 482};
-    public static final int[] IRON_BAR_RAW = {622, 482};
+    public static final int[] IRON_BAR_RAW = {624, 482};
     public static final int[] LEATHER_RAW = {384, 670};
     public static final int[] BLOODSTONE_SHARD_RAW = {94, 820};
 

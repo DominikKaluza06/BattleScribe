@@ -190,7 +190,7 @@ public class BattleActivity extends AppCompatActivity {
         }
         
         if (equippedWeapon == null) {
-            btnBasicAttack.setImageResource(android.R.drawable.ic_menu_send);
+            btnBasicAttack.setImageResource(R.drawable.basic_strike);
         }
         
         // Calculate dynamic limits
